@@ -10,7 +10,18 @@ namespace EmployeeService
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            // Use Auth
+            builder.Services.AddAuthorization();
+
+            // Add DbConnection and ApplicationName
+            var appName = builder.Configuration["ApplicationSettings:ApplicationName"];
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
             var app = builder.Build();
+
+            // Log application name and connection string for debugging
+            app.Logger.LogInformation("App Name: {AppName}", appName);
+            app.Logger.LogInformation("Connection String: {ConnectionString}", connectionString);
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

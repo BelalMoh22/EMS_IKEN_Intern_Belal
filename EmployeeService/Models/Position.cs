@@ -7,5 +7,7 @@
         public decimal MinSalary { get; set; }
 
         public decimal MaxSalary { get; set; }
+
+        public int DepartmentId { get; set; }
     }
 }

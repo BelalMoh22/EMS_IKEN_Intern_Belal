@@ -1,15 +1,9 @@
-﻿using Dapper;
-using EmployeeService.Models;
-using EmployeeService.Repositories.Interfaces;
-using Microsoft.Data.SqlClient;
-using System.Data;
-
-namespace EmployeeService.Repositories.Implementations
+﻿namespace EmployeeService.Repositories.Implementations
 {
     public abstract class GenericRepo<T> : IGenericRepo<T> where T : BaseEntity
     {
         protected readonly IDbConnection _connection;
-        protected readonly string _tableName;
+        protected string _tableName;
 
         protected GenericRepo(IConfiguration configuration)
         {
@@ -33,7 +27,7 @@ namespace EmployeeService.Repositories.Implementations
 
         public abstract Task<int> AddAsync(T entity);
 
-        public abstract Task<int> UpdateAsync(T entity);
+        public abstract Task<int> UpdateAsync(int id ,T entity);
 
         public async Task<int> DeleteAsync(int id)
         {

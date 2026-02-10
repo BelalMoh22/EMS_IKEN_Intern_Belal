@@ -1,7 +1,4 @@
-﻿using Dapper;
-using EmployeeService.Models;
-
-namespace EmployeeService.Repositories.Implementations
+﻿namespace EmployeeService.Repositories.Implementations
 {
     public class DepartmentRepository : GenericRepo<Department>
     {
@@ -20,7 +17,7 @@ namespace EmployeeService.Repositories.Implementations
             return await _connection.ExecuteScalarAsync<int>(sql, department);
         }
 
-        public override async Task<int> UpdateAsync(Department department)
+        public override async Task<int> UpdateAsync(int id , Department department)
         {
             var sql = @"
                 UPDATE Departments
@@ -30,7 +27,12 @@ namespace EmployeeService.Repositories.Implementations
                     IsActive = @IsActive
                 WHERE Id = @Id
             ";
-            return await _connection.ExecuteAsync(sql, department);
+            return await _connection.ExecuteAsync(sql, new {
+                Id = id,
+                department.DepartmentName,
+                department.ManagerId,
+                department.IsActive
+            });
         }
     }
 }

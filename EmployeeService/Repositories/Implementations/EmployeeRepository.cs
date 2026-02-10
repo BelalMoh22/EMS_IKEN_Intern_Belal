@@ -1,8 +1,4 @@
 ﻿using Dapper;
-using EmployeeService.Models;
-using EmployeeService.Repositories.Interfaces;
-using Microsoft.Data.SqlClient;
-using System.Data;
 
 namespace EmployeeService.Repositories.Implementations
 {
@@ -28,20 +24,48 @@ namespace EmployeeService.Repositories.Implementations
             return employee;
         }
 
-        public async Task<int> AddAsync(Employee entity)
+        public async Task<int> AddAsync(CreateEmployeeDTO emp)
         {
-            var sql = @"INSERT INTO Employees (FirstName, Lastname, NationalId, Email, PhoneNumber, DateOfBirth, Address, Salary, HireDate, Status, DepartmentId, PositionId) 
-                        VALUES (@FirstName, @Lastname, @NationalId, @Email, @PhoneNumber, @DateOfBirth, @Address, @Salary, @HireDate, @Status, @DepartmentId, @PositionId)
+            var sql = @"INSERT INTO Employees (FirstName, Lastname, NationalId, Email, PhoneNumber, DateOfBirth, Address, Salary, HireDate, Status, PositionId) 
+                        VALUES (@FirstName, @Lastname, @NationalId, @Email, @PhoneNumber, @DateOfBirth, @Address, @Salary, @HireDate, @Status, @PositionId)
                         SELECT CAST(SCOPE_IDENTITY() AS INT);";
-            
-            return await _connection.QuerySingleAsync<int>(sql, entity);
-        }
-        public async Task<int> UpdateAsync(Employee entity)
-        {
-            var sql = @"UPDATE Employees SET FirstName = @FirstName, Lastname = @Lastname, NationalId = @NationalId, Email = @Email, PhoneNumber = @PhoneNumber, DateOfBirth = @DateOfBirth, Address = @Address, Salary = @Salary, HireDate = @HireDate, Status = @Status, DepartmentId = @DepartmentId, PositionId = @PositionId
-                        WHERE Id = @Id";
 
-            return await _connection.ExecuteAsync(sql, entity);
+            return await _connection.QuerySingleAsync<int>(sql, emp);
+        }
+        public async Task<int> UpdateAsync(int id, UpdateEmployeeDTO entity)
+        {
+            var sql = @"
+                        UPDATE Employees
+                        SET
+                            FirstName = @FirstName,
+                            Lastname = @Lastname,
+                            NationalId = @NationalId,
+                            Email = @Email,
+                            PhoneNumber = @PhoneNumber,
+                            DateOfBirth = @DateOfBirth,
+                            Address = @Address,
+                            Salary = @Salary,
+                            HireDate = @HireDate,
+                            Status = @Status,
+                            PositionId = @PositionId
+                        WHERE Id = @Id
+                    ";
+
+            return await _connection.ExecuteAsync(sql, new
+            {
+                Id = id,
+                entity.FirstName,
+                entity.Lastname,
+                entity.NationalId,
+                entity.Email,
+                entity.PhoneNumber,
+                entity.DateOfBirth,
+                entity.Address,
+                entity.Salary,
+                entity.HireDate,
+                entity.Status,
+                entity.PositionId
+            });
         }
         public async Task<int> SoftDeleteAsync(int id)
         {

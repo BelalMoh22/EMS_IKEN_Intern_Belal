@@ -1,5 +1,5 @@
+
 using EmployeeService.Models;
-using EmployeeService.Repositories.Implementations;
 using EmployeeService.Repositories.Interfaces;
 
 namespace EmployeeService
@@ -40,7 +40,8 @@ namespace EmployeeService
             app.UseAuthorization();
 
             // /health endpoint 
-            app.MapGet("/api/health", () => Results.Ok("First EndPoint From EMS"));
+            //app.MapGet("/api/health", () => Results.Ok("First EndPoint From EMS"));
+            await app.MapGroup("/api/employees").MapEmployeeEndPoint();
 
             app.Run();
         }

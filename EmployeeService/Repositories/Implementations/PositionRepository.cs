@@ -1,12 +1,9 @@
-﻿using Dapper;
-using EmployeeService.Models;
-
-namespace EmployeeService.Repositories.Implementations
+﻿namespace EmployeeService.Repositories.Implementations
 {
     public class PositionRepository : GenericRepo<Position>
     {
         public PositionRepository(IConfiguration configuration) : base(configuration) {}
-        
+
         public override async Task<int> AddAsync(Position position)
         {
             var sql = @"
@@ -21,7 +18,7 @@ namespace EmployeeService.Repositories.Implementations
             return await _connection.ExecuteScalarAsync<int>(sql, position);
         }
 
-        public override async Task<int> UpdateAsync(Position position)
+        public override async Task<int> UpdateAsync(int id, Position position)
         {
             var sql = @"
                 UPDATE Positions
@@ -32,7 +29,14 @@ namespace EmployeeService.Repositories.Implementations
                 WHERE Id = @Id
             ";
 
-            return await _connection.ExecuteAsync(sql, position);
+            return await _connection.ExecuteAsync(sql, new
+            {
+                Id = id,
+                position.PositionName,
+                position.MinSalary,
+                position.MaxSalary,
+                position.DepartmentId,
+            });
         }
     }
 }

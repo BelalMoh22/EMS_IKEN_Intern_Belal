@@ -1,9 +1,7 @@
 ﻿namespace EmployeeService.Models
 {
-    public class Position
+    public class Position : BaseEntity
     {
-        public int PositionId { get; set; }
-
         public string PositionName { get; set; }
 
         public decimal MinSalary { get; set; }

@@ -1,3 +1,7 @@
+using EmployeeService.Models;
+using EmployeeService.Repositories.Implementations;
+using EmployeeService.Repositories.Interfaces;
+
 namespace EmployeeService
 {
     public class Program
@@ -9,7 +13,9 @@ namespace EmployeeService
             // Add services to the container.
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
+            builder.Services.AddScoped<IEmployeeRepo, EmployeeRepository>();
+            builder.Services.AddScoped<IGenericRepo<Department>, DepartmentRepository>();
+            builder.Services.AddScoped<IGenericRepo<Position>, PositionRepository>();
             // Use Auth
             builder.Services.AddAuthorization();
 

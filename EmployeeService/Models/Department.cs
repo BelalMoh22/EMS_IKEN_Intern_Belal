@@ -1,9 +1,7 @@
 ﻿namespace EmployeeService.Models
 {
-    public class Department
+    public class Department : BaseEntity
     {
-        public int DepartmentId { get; set; }
-
         public string DepartmentName { get; set; }
 
         public int ManagerId { get; set; }

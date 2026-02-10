@@ -2,10 +2,8 @@
 
 namespace EmployeeService.Models
 {
-    public class Employee
+    public class Employee : BaseEntity
     {
-        public int EmployeeId { get; set; }
-
         public string FirstName { get; set; }
 
         public string Lastname { get; set; }

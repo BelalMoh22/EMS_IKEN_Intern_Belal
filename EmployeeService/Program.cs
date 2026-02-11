@@ -52,6 +52,8 @@ namespace EmployeeService
             }
 
             app.UseHttpsRedirection();
+            app.UseMiddleware<GlobalExceptionMiddleware>();
+            app.UseMiddleware<RequestLoggingMiddleware>();
             app.UseAuthorization();
 
             // /health endpoint 

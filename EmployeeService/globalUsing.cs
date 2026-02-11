@@ -8,4 +8,7 @@ global using EmployeeService.Models;
 global using static Dapper.SqlMapper;
 global using EmployeeService.Repositories.Implementations;
 global using EmployeeService.EndPoints;
+global using System.Net;
+global using System.Text.Json;
+global using EmployeeService.Middlewares;
 

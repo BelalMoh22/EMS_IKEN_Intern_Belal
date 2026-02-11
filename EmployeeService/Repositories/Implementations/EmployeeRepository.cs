@@ -15,7 +15,7 @@
         {
             var sql = "SELECT * FROM Employees WHERE IsDeleted = 0";
 
-            _logger.LogDebug("SQL: Retrieving active employees.");
+            _logger.LogDebug("Executing SQL: {Sql}", sql);
 
             return await _connection.QueryAsync<Employee>(sql);
         }
@@ -24,46 +24,43 @@
         {
             var sql = "SELECT * FROM Employees WHERE Id = @Id";
 
-            _logger.LogDebug("SQL: Retrieving employee with Id {Id}.", id);
+            _logger.LogDebug("Executing SQL: {Sql} with Id {Id}", sql, id);
 
             return await _connection.QueryFirstOrDefaultAsync<Employee>(sql, new { Id = id });
         }
 
         public async Task<int> AddAsync(CreateEmployeeDTO dto)
         {
-            var sql = @"
-                INSERT INTO Employees
-                (FirstName, Lastname, NationalId, Email, PhoneNumber,
-                 DateOfBirth, Address, Salary, HireDate, Status, PositionId)
-                VALUES
-                (@FirstName, @Lastname, @NationalId, @Email, @PhoneNumber,
-                 @DateOfBirth, @Address, @Salary, @HireDate, @Status, @PositionId);
-                SELECT CAST(SCOPE_IDENTITY() AS INT);";
+            var sql = @"INSERT INTO Employees
+        (FirstName, Lastname, NationalId, Email, PhoneNumber,
+         DateOfBirth, Address, Salary, HireDate, Status, PositionId)
+        VALUES
+        (@FirstName, @Lastname, @NationalId, @Email, @PhoneNumber,
+         @DateOfBirth, @Address, @Salary, @HireDate, @Status, @PositionId);
+        SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
-            _logger.LogDebug("SQL: Inserting employee with Email {Email}.", dto.Email);
+            _logger.LogDebug("Executing INSERT for Email {Email}", dto.Email);
 
             return await _connection.QuerySingleAsync<int>(sql, dto);
         }
 
         public async Task<int> UpdateAsync(int id, UpdateEmployeeDTO dto)
         {
-            var sql = @"
-                UPDATE Employees
-                SET
-                    FirstName = @FirstName,
-                    Lastname = @Lastname,
-                    NationalId = @NationalId,
-                    Email = @Email,
-                    PhoneNumber = @PhoneNumber,
-                    DateOfBirth = @DateOfBirth,
-                    Address = @Address,
-                    Salary = @Salary,
-                    HireDate = @HireDate,
-                    Status = @Status,
-                    PositionId = @PositionId
-                WHERE Id = @Id";
+            var sql = @"UPDATE Employees SET
+            FirstName = @FirstName,
+            Lastname = @Lastname,
+            NationalId = @NationalId,
+            Email = @Email,
+            PhoneNumber = @PhoneNumber,
+            DateOfBirth = @DateOfBirth,
+            Address = @Address,
+            Salary = @Salary,
+            HireDate = @HireDate,
+            Status = @Status,
+            PositionId = @PositionId
+            WHERE Id = @Id";
 
-            _logger.LogDebug("SQL: Updating employee with Id {Id}.", id);
+            _logger.LogDebug("Executing UPDATE for Id {Id}", id);
 
             return await _connection.ExecuteAsync(sql, new
             {
@@ -86,7 +83,7 @@
         {
             var sql = "UPDATE Employees SET IsDeleted = 1 WHERE Id = @Id";
 
-            _logger.LogDebug("SQL: Soft deleting employee with Id {Id}.", id);
+            _logger.LogDebug("Executing SOFT DELETE for Id {Id}", id);
 
             return await _connection.ExecuteAsync(sql, new { Id = id });
         }

@@ -1,6 +1,6 @@
-﻿namespace EmployeeService.Features.Employees.DTO_s
+﻿namespace EmployeeService.Features.Employees.CreateEmployee
 {
-    public class UpdateEmployeeDTO
+    public class CreateEmployeeDTO
     {
         public string FirstName { get; set; }
 
@@ -12,7 +12,7 @@
 
         public string PhoneNumber { get; set; }
 
-        public DateTime DateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; set; } 
 
         public string Address { get; set; }
 

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace EmployeeService.Middlewares
+﻿namespace EmployeeService.Middlewares
 {
     public class GlobalExceptionMiddleware
     {
@@ -24,7 +22,7 @@ namespace EmployeeService.Middlewares
 
                 context.Response.StatusCode = ex switch
                 {
-                    CustomExceptions.ValidationException => StatusCodes.Status400BadRequest,
+                    Exceptions.ValidationException => StatusCodes.Status400BadRequest,
                     NotFoundException => StatusCodes.Status404NotFound,
                     _ => StatusCodes.Status400BadRequest
                 };

@@ -1,5 +1,3 @@
-using EmployeeService.Repositories;
-
 namespace EmployeeService
 {
     public class Program
@@ -13,9 +11,10 @@ namespace EmployeeService
             // Add services to the container.
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddScoped<IEmployeeRepo, EmployeeRepository>();
-            builder.Services.AddScoped<IGenericRepo<Department>, DepartmentRepository>();
-            builder.Services.AddScoped<IGenericRepo<Position>, PositionRepository>();
+            builder.Services.AddScoped<IDbConnectionFactory, SqlConnectionFactory>();
+            builder.Services.AddScoped<IRepository<Employee>, EmployeeRepository>();
+            builder.Services.AddScoped<IRepository<Department>, DepartmentRepository>();
+            builder.Services.AddScoped<IRepository<Position>, PositionRepository>();
             builder.Services.AddScoped<IGetEmployeesHandler, GetEmployeesHandler>();
             builder.Services.AddScoped<IGetEmployeeByIdHandler, GetEmployeeByIdHandler>();
             builder.Services.AddScoped<ICreateEmployeeHandler, CreateEmployeeHandler>();
@@ -33,7 +32,6 @@ namespace EmployeeService
             app.Logger.LogTrace("Application is starting (Trace)");
             app.Logger.LogInformation("Application started successfully (Information)");
             app.Logger.LogWarning("This is a sample warning during startup (Warning)");
-
             try
             {
                 if (string.IsNullOrEmpty(builder.Configuration.GetConnectionString("DefaultConnection")))

@@ -10,7 +10,11 @@ namespace EmployeeService.Features.Employees.CreateEmployee
             app.MapPost("/", async ([FromBody] CreateEmployeeCommand command, [FromServices] IMediator mediator) =>
             {
                 var id = await mediator.Send(command);
-                return Results.Created($"/employees/{id}", id);
+
+                var response = ApiResponse<int>
+                    .SuccessResponse(id, "Employee created successfully");
+
+                return Results.Created($"/employees/{id}", response);
             }).WithName("CreateEmployee").WithTags("Employees");
         }
     }

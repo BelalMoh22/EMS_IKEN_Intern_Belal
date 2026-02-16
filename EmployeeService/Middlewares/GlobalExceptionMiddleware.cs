@@ -3,48 +3,45 @@
     public class GlobalExceptionMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger<GlobalExceptionMiddleware> _logger;
 
-        public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)
+        public GlobalExceptionMiddleware(RequestDelegate next)
         {
             _next = next;
-            _logger = logger;
         }
+
         public async Task InvokeAsync(HttpContext context)
         {
             try
             {
                 await _next(context);
             }
-            catch (AppException ex)
+            catch (Exceptions.ValidationException ex)
             {
-                _logger.LogWarning(ex.Message);
-
-                context.Response.StatusCode = ex switch
-                {
-                    Exceptions.ValidationException => StatusCodes.Status400BadRequest,
-                    NotFoundException => StatusCodes.Status404NotFound,
-                    _ => StatusCodes.Status400BadRequest
-                };
-
-                await context.Response.WriteAsJsonAsync(new ProblemDetails
-                {
-                    Status = context.Response.StatusCode,
-                    Title = ex.Message
-                });
+                await HandleExceptionAsync(context, 400, ex.Message);
+            }
+            catch (NotFoundException ex)
+            {
+                await HandleExceptionAsync(context, 404, ex.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled exception occurred.");
-
-                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    success = false,
-                    error = "Internal Server Error"
-                });
+                await HandleExceptionAsync(context, 500, "Internal Server Error");
             }
+        }
+
+        private static Task HandleExceptionAsync(HttpContext context, int statusCode, string message)
+        {
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = statusCode;
+
+            var response = ApiResponse<string>.FailureResponse(
+                new List<string> { message },
+                "Request Failed"
+            );
+            
+            var json = JsonSerializer.Serialize(response);
+
+            return context.Response.WriteAsync(json);
         }
     }
 }

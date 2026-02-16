@@ -19,3 +19,4 @@ global using EmployeeService.Features.Employees.GetEmployees;
 global using EmployeeService.Features.Employees.GetEmployeeById;
 global using EmployeeService.Middlewares;
 global using EmployeeService.Exceptions;
+global using EmployeeService.Domain.Common;

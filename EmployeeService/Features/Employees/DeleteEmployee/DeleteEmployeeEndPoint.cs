@@ -1,7 +1,4 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
-
-namespace EmployeeService.Features.Employees.DeleteEmployee
+﻿namespace EmployeeService.Features.Employees.DeleteEmployee
 {
     public static class DeleteEmployeeEndPoint
     {

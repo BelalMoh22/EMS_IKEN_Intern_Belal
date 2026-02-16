@@ -1,6 +1,15 @@
 ﻿namespace EmployeeService.Features.Employees.GetEmployees
 {
-    public class GetEmployeesEndpoint
+    public static class GetEmployeesEndpoint
     {
+        public static void MapEndpoint(this IEndpointRouteBuilder app)
+        {
+            app.MapGet("/", async ([FromServices] IMediator mediator) =>
+            {
+                var command = new GetEmployeesQuery();
+                var result = await mediator.Send(command);
+                return Results.Ok(result);
+            }).WithName("GetEmployees").WithTags("Employees");
+        }
     }
 }

@@ -15,6 +15,7 @@ global using EmployeeService.Infrastructure.Repositories;
 global using EmployeeService.Features.Employees.CreateEmployee;
 global using EmployeeService.Features.Employees.UpdateEmployee;
 global using EmployeeService.Features.Employees.DeleteEmployee;
-global using EmployeeService.Features.Employees.Handlers.Implementations;
+global using EmployeeService.Features.Employees.GetEmployees;
+global using EmployeeService.Features.Employees.GetEmployeeById;
 global using EmployeeService.Middlewares;
 global using EmployeeService.Exceptions;

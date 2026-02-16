@@ -11,7 +11,8 @@ namespace EmployeeService.Features.Employees.UpdateEmployee
             {
                 var command = new UpdateEmployeeCommand(id, dto);
                 var rows = await mediator.Send(command);
-                return Results.Ok("Employee Updated Successfully");
+                var response = ApiResponse<int>.SuccessResponse(id, "Employee updated successfully");
+                return Results.Ok(response);
             }).WithDescription("Updating an existing Employee").WithTags("Employees");
         }
     }

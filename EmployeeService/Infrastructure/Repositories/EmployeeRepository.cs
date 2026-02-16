@@ -13,8 +13,8 @@
 
         public override async Task<int> AddAsync(Employee employee)
         {
-            var sql = @"
-                INSERT INTO Employees
+            var sql = $@"
+                INSERT INTO {TableName}
                 (
                     FirstName,
                     Lastname,
@@ -53,8 +53,8 @@
 
         public override async Task<int> UpdateAsync(int id, Employee employee)
         {
-            var sql = @"
-                UPDATE Employees
+            var sql = $@"
+                UPDATE {TableName}
                 SET
                     FirstName = @FirstName,
                     Lastname = @Lastname,

@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeService.Middlewares
 {
@@ -6,37 +6,46 @@ namespace EmployeeService.Middlewares
     {
         private readonly RequestDelegate _next;
         private readonly ILogger<GlobalExceptionMiddleware> _logger;
-        private readonly IWebHostEnvironment _env;
 
-        public GlobalExceptionMiddleware(RequestDelegate next,ILogger<GlobalExceptionMiddleware> logger , IWebHostEnvironment env)
+        public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)
         {
             _next = next;
             _logger = logger;
-            _env = env;
         }
-
         public async Task InvokeAsync(HttpContext context)
         {
             try
             {
                 await _next(context);
             }
+            catch (AppException ex)
+            {
+                _logger.LogWarning(ex.Message);
+
+                context.Response.StatusCode = ex switch
+                {
+                    CustomExceptions.ValidationException => StatusCodes.Status400BadRequest,
+                    NotFoundException => StatusCodes.Status404NotFound,
+                    _ => StatusCodes.Status400BadRequest
+                };
+
+                await context.Response.WriteAsJsonAsync(new ProblemDetails
+                {
+                    Status = context.Response.StatusCode,
+                    Title = ex.Message
+                });
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unhandled exception occurred.");
 
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                context.Response.ContentType = "application/json";
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-                var response = new
+                await context.Response.WriteAsJsonAsync(new
                 {
-                    StatusCode = 500,
-                    Message = _env.IsDevelopment() ? ex.Message : "Something went wrong."
-                };
-
-                var json = JsonSerializer.Serialize(response);
-
-                await context.Response.WriteAsync(json);
+                    success = false,
+                    error = "Internal Server Error"
+                });
             }
         }
     }

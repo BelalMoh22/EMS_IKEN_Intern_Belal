@@ -11,4 +11,7 @@ global using EmployeeService.EndPoints;
 global using System.Net;
 global using System.Text.Json;
 global using EmployeeService.Middlewares;
-
+global using EmployeeService.Handlers.EmployeeHandler.Interfaces;
+global using EmployeeService.Handlers.EmployeeHandler.Implementations;
+global using EmployeeService.CustomExceptions;
+global using System.ComponentModel.DataAnnotations;

@@ -1,3 +1,5 @@
+using EmployeeService.Repositories;
+
 namespace EmployeeService
 {
     public class Program
@@ -7,7 +9,6 @@ namespace EmployeeService
             var builder = WebApplication.CreateBuilder(args);
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole();
-            builder.Logging.SetMinimumLevel(LogLevel.Debug);
 
             // Add services to the container.
             builder.Services.AddEndpointsApiExplorer();
@@ -15,6 +16,11 @@ namespace EmployeeService
             builder.Services.AddScoped<IEmployeeRepo, EmployeeRepository>();
             builder.Services.AddScoped<IGenericRepo<Department>, DepartmentRepository>();
             builder.Services.AddScoped<IGenericRepo<Position>, PositionRepository>();
+            builder.Services.AddScoped<IGetEmployeesHandler, GetEmployeesHandler>();
+            builder.Services.AddScoped<IGetEmployeeByIdHandler, GetEmployeeByIdHandler>();
+            builder.Services.AddScoped<ICreateEmployeeHandler, CreateEmployeeHandler>();
+            builder.Services.AddScoped<IUpdateEmployeeHandler, UpdateEmployeeHandler>();
+            builder.Services.AddScoped<IDeleteEmployeeHandler, DeleteEmployeeHandler>();
             // Use Auth
             builder.Services.AddAuthorization();
 
@@ -51,16 +57,16 @@ namespace EmployeeService
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
+            // Best Order for Middleware: Exception Handling, Logging, Authentication, Authorization
             app.UseMiddleware<GlobalExceptionMiddleware>();
             app.UseMiddleware<RequestLoggingMiddleware>();
+            app.UseHttpsRedirection();
             app.UseAuthorization();
 
             // /health endpoint 
             //app.MapGet("/api/health", () => Results.Ok("First EndPoint From EMS"));
             app.MapGroup("/api/employees").MapEmployeeEndPoint();
             app.Run();
-
         }
     }
 }

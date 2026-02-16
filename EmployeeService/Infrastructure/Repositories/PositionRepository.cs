@@ -10,8 +10,8 @@
 
         public override async Task<int> AddAsync(Position position)
         {
-            var sql = @"
-            INSERT INTO Positions
+            var sql = $@"
+            INSERT INTO {TableName}
                 (PositionName, MinSalary, MaxSalary, DepartmentId)
             VALUES
                 (@PositionName, @MinSalary, @MaxSalary, @DepartmentId);
@@ -24,8 +24,8 @@
 
         public override async Task<int> UpdateAsync(int id, Position position)
         {
-            var sql = @"
-            UPDATE Positions
+            var sql = $@"
+            UPDATE {TableName}
             SET
                 PositionName = @PositionName,
                 MinSalary = @MinSalary,

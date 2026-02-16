@@ -12,8 +12,8 @@
 
         public override async Task<int> AddAsync(Department department)
         {
-            var sql = @"
-            INSERT INTO Departments
+            var sql = $@"
+            INSERT INTO {TableName}
                 (DepartmentName, ManagerId, IsActive)
             VALUES
                 (@DepartmentName, @ManagerId, @IsActive);
@@ -26,8 +26,8 @@
 
         public override async Task<int> UpdateAsync(int id, Department department)
         {
-            var sql = @"
-            UPDATE Departments
+            var sql = $@"
+            UPDATE {TableName}
             SET
                 DepartmentName = @DepartmentName,
                 ManagerId = @ManagerId,

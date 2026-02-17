@@ -2,26 +2,38 @@
 {
     public class UpdateEmployeeDTO
     {
-        public string FirstName { get; set; }
+        [MaxLength(50)]
+        public string? FirstName { get; set; }
 
-        public string Lastname { get; set; }
+        [MaxLength(50)]
+        public string? Lastname { get; set; }
 
-        public int NationalId { get; set; }
+        [RegularExpression(@"^\d{14}$",
+            ErrorMessage = "National ID must be exactly 14 numbers.")]
+        public string? NationalId { get; set; }
 
-        public string Email { get; set; }
+        [EmailAddress(ErrorMessage = "Email must contain @ and be valid.")]
+        public string? Email { get; set; }
 
-        public string PhoneNumber { get; set; }
+        public int? PhoneNumber { get; set; }
 
-        public DateTime DateOfBirth { get; set; }
+        [MinimumAge(18)]
+        [NotFutureDate(ErrorMessage = "Date of Birth cannot be in the future.")]
+        [DataType(DataType.Date)]
+        public DateTime? DateOfBirth { get; set; }
 
-        public string Address { get; set; }
+        [MaxLength(200)]
+        public string? Address { get; set; }
 
-        public decimal Salary { get; set; }
+        public decimal? Salary { get; set; }
 
+        [NotFutureDate(ErrorMessage = "Hire Date cannot be in the future.")]
+        [DataType(DataType.Date)]
         public DateTime? HireDate { get; set; } = DateTime.UtcNow;
 
         public EmployeeStatus? Status { get; set; } = EmployeeStatus.Active;
 
-        public int PositionId { get; set; }
+        [ForeignKey("Position")]
+        public int? PositionId { get; set; }
     }
 }

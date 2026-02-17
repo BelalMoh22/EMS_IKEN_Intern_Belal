@@ -1,4 +1,7 @@
-﻿namespace EmployeeService.Features.Employees.UpdateEmployee
+﻿using System.Text.Json.Serialization;
+
+namespace EmployeeService.Features.Employees.UpdateEmployee
 {
-    public record UpdateEmployeeCommand([FromRoute] int id , [FromBody]UpdateEmployeeDTO dto): IRequest<int>;
+    public record UpdateEmployeeCommand(int Id, UpdateEmployeeDTO dto) : IRequest<int>;
+
 }

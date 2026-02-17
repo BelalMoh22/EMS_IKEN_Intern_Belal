@@ -9,9 +9,16 @@
             _repo = repo;
         }
 
-        public async Task<Employee?> Handle(GetEmployeeByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Employee> Handle(GetEmployeeByIdQuery request, CancellationToken cancellationToken)
         {
-            return await _repo.GetByIdAsync(request.Id);
+            if(request.Id <= 0) 
+                throw new Exceptions.ValidationException(new() { "Id must be greater than 0." });
+            var employee = await _repo.GetByIdAsync(request.Id);
+            
+            if(employee == null)
+                throw new Exceptions.NotFoundException($"Employee with Id {request.Id} not found.");
+
+            return employee;
         }
     }
 }

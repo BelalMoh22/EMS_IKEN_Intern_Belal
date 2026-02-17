@@ -33,3 +33,7 @@ global using EmployeeService.Features.Positions.UpdatePosition;
 global using EmployeeService.Middlewares;
 global using EmployeeService.Exceptions;
 global using EmployeeService.Domain.Common;
+global using System.ComponentModel.DataAnnotations.Schema;
+global using EmployeeService.Domain.Attributes;
+global using EmployeeService.Infrastructure.BusinessRules.Employees;
+global using EmployeeService.Features.Employees;

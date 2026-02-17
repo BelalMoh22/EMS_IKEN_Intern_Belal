@@ -1,5 +1,3 @@
-using EmployeeService.Features.Employees;
-
 namespace EmployeeService
 {
     public class Program
@@ -17,11 +15,7 @@ namespace EmployeeService
             builder.Services.AddScoped<IRepository<Employee>, EmployeeRepository>();
             builder.Services.AddScoped<IRepository<Department>, DepartmentRepository>();
             builder.Services.AddScoped<IRepository<Position>, PositionRepository>();
-            //builder.Services.AddScoped<IGetEmployeesHandler, GetEmployeesHandler>();
-            //builder.Services.AddScoped<IGetEmployeeByIdHandler, GetEmployeeByIdHandler>();
-            //builder.Services.AddScoped<ICreateEmployeeHandler, CreateEmployeeHandler>();
-            //builder.Services.AddScoped<IUpdateEmployeeHandler, UpdateEmployeeHandler>();
-            //builder.Services.AddScoped<IDeleteEmployeeHandler, DeleteEmployeeHandler>();
+            builder.Services.AddScoped<IEmployeeBusinessRules, EmployeeBusinessRules>();
             // Use Auth
             builder.Services.AddAuthorization();
 

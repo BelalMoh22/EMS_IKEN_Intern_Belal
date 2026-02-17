@@ -17,26 +17,28 @@
             }
             catch (Exceptions.ValidationException ex)
             {
-                await HandleExceptionAsync(context, 400, ex.Message);
+                await HandleExceptionAsync(context, 400, ex.Errors);
             }
             catch (NotFoundException ex)
             {
-                await HandleExceptionAsync(context, 404, ex.Message);
+                await HandleExceptionAsync(context, 404, new List<string> { ex.Message });
             }
             catch (Exception ex)
             {
-                await HandleExceptionAsync(context, 500, "Internal Server Error");
+                await HandleExceptionAsync(context, 500,
+                    new List<string> { ex.Message });
             }
         }
 
-        private static Task HandleExceptionAsync(HttpContext context, int statusCode, string message)
+
+        private static Task HandleExceptionAsync(HttpContext context, int statusCode, List<string> errors)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = statusCode;
 
             var response = ApiResponse<string>.FailureResponse(
-                new List<string> { message },
-                "Request Failed"
+                errors,
+                "An error occurred while processing your request."
             );
             
             var json = JsonSerializer.Serialize(response);

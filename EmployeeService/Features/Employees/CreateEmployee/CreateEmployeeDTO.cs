@@ -2,26 +2,44 @@
 {
     public class CreateEmployeeDTO
     {
+        [Required(ErrorMessage = "First Name is required.")]
+        [MaxLength(50)]
         public string FirstName { get; set; }
 
+        [Required(ErrorMessage = "Last Name is required.")]
+        [MaxLength(50)]
         public string Lastname { get; set; }
 
-        public int NationalId { get; set; }
+        [Required(ErrorMessage = "National ID is required.")]
+        [RegularExpression(@"^\d{14}$",ErrorMessage = "National ID must be exactly 14 numbers.")]
+        public string NationalId { get; set; }
 
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Email must contain @ and be valid.")]
         public string Email { get; set; }
 
-        public string PhoneNumber { get; set; }
+        [Required(ErrorMessage = "Phone Number is required.")]
+        public int PhoneNumber { get; set; }
 
-        public DateTime DateOfBirth { get; set; } 
+        [Required(ErrorMessage = "Date of Birth is required.")]
+        [MinimumAge(18)]
+        [NotFutureDate(ErrorMessage = "Date of Birth cannot be in the future.")]
+        [DataType(DataType.Date)]
+        public DateTime DateOfBirth { get; set; }
 
+        [MaxLength(200)]
         public string Address { get; set; }
 
         public decimal Salary { get; set; }
 
-        public DateTime? HireDate { get; set; } = DateTime.UtcNow;
+        [NotFutureDate(ErrorMessage = "Hire Date cannot be in the future.")]
+        [DataType(DataType.Date)]
+        public DateTime? HireDate { get; set; }
 
-        public EmployeeStatus? Status { get; set; } = EmployeeStatus.Active;
+        [Required(ErrorMessage = "Status is required.")]
+        public EmployeeStatus? Status { get; set; }
 
+        [Required(ErrorMessage = "PositionId is required.")]
         public int PositionId { get; set; }
     }
 }

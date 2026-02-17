@@ -2,7 +2,12 @@
 {
     public class ValidationException : AppException
     {
-        public ValidationException(string message) : base(message) { }
-    }
+        public List<string> Errors { get; }
 
+        public ValidationException(List<string> errors)
+            : base("Validation Failed")
+        {
+            Errors = errors;
+        }
+    }
 }

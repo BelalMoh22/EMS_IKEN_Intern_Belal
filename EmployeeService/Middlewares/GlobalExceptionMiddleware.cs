@@ -23,10 +23,15 @@
             {
                 await HandleExceptionAsync(context, 404, ex.Message);
             }
+            //catch (Exception ex)
+            //{
+            //    await HandleExceptionAsync(context, 500, "Internal Server Error");
+            //}
             catch (Exception ex)
             {
-                await HandleExceptionAsync(context, 500, "Internal Server Error");
+                await HandleExceptionAsync(context, 500, ex.Message);
             }
+
         }
 
         private static Task HandleExceptionAsync(HttpContext context, int statusCode, string message)

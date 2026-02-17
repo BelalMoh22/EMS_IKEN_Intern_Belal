@@ -1,3 +1,4 @@
+using EmployeeService.Features.Departments;
 using EmployeeService.Features.Employees;
 
 namespace EmployeeService
@@ -70,6 +71,8 @@ namespace EmployeeService
             // /health endpoint 
             //app.MapGet("/api/health", () => Results.Ok("First EndPoint From EMS"));
             app.MapGroup("/api/employees").MapEmployeesEndpoints();
+            app.MapGroup("/api/departments").MapDepartmentEndpoints();
+
             app.Run();
         }
     }

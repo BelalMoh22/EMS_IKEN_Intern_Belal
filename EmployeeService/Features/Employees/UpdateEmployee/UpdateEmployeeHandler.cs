@@ -1,6 +1,4 @@
-﻿using EmployeeService.Features.Employees.UpdateEmployee;
-
-namespace EmployeeService.Features.Employees.Handlers.Implementations
+﻿namespace EmployeeService.Features.Employees.Handlers.Implementations
 {
     public class UpdateEmployeeHandler : IRequestHandler<UpdateEmployeeCommand, int>
     {

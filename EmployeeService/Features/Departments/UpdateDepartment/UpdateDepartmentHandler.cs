@@ -22,7 +22,6 @@
 
             ValidationHelper.ValidateModel(request.dto);
 
-            // Determine effective manager id
             var effectiveManagerId = request.dto.ManagerId != 0 ? request.dto.ManagerId : existingDepartment.ManagerId;
             await _rules.ValidateAsync(effectiveManagerId);
 
@@ -30,7 +29,6 @@
             existingDepartment.ManagerId = effectiveManagerId;
 
             var rows = await _repo.UpdateAsync(request.id, existingDepartment);
-
             return rows;
         }
     }

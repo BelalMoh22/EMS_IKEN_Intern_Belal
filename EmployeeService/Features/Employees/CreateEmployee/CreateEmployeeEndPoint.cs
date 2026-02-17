@@ -13,7 +13,6 @@ namespace EmployeeService.Features.Employees.CreateEmployee
                 var id = await mediator.Send(command);
                
                 var response = ApiResponse<int>.SuccessResponse("Employee created successfully");
-
                 return Results.Created($"/employees/{id}", response);
             }).WithName("CreateEmployee").WithTags("Employees");
         }

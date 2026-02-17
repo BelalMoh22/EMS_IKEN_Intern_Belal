@@ -6,7 +6,6 @@
         {
             app.MapPut("/{id:int}", async ([FromRoute] int id, [FromBody] UpdateEmployeeDTO dto, [FromServices] IMediator mediator) =>
             {
-                // ensure route id is used, not body
                 var command = new UpdateEmployeeCommand(id , dto);
                 var rows = await mediator.Send(command);
                 var response = ApiResponse<int>.SuccessResponse("Employee updated successfully");

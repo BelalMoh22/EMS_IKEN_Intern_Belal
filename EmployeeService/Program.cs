@@ -8,7 +8,7 @@ namespace EmployeeService
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole();
 
-            // Add services to the container.
+            // Add services to the container(DI).
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddScoped<IDbConnectionFactory, SqlConnectionFactory>();

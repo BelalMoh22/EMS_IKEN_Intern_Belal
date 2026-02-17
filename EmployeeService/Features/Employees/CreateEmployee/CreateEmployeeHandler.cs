@@ -6,30 +6,20 @@
         private readonly IRepository<Employee> _repo;
         private readonly IEmployeeBusinessRules _rules;
 
-        public CreateEmployeeHandler(
-            IRepository<Employee> repo,
-            IEmployeeBusinessRules rules)
+        public CreateEmployeeHandler(IRepository<Employee> repo,IEmployeeBusinessRules rules)
         {
             _repo = repo;
             _rules = rules;
         }
 
-        public async Task<int> Handle(
-            CreateEmployeeCommand request,
-            CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateEmployeeCommand request,CancellationToken cancellationToken)
         {
-            var dto = request.dto
-                ?? throw new Exceptions.ValidationException(
-                    new() { "Employee data is required." });
+            var dto = request.dto;
+            if (dto == null)
+                throw new Exceptions.ValidationException(new() { "Employee data is required." });
 
             ValidationHelper.ValidateModel(dto);
-
-            await _rules.ValidateAsync(
-                null, // null = Create
-                dto.Email,
-                dto.NationalId,
-                dto.Salary,
-                dto.PositionId);
+            await _rules.ValidateAsync(null, dto.Email,dto.NationalId,dto.Salary,dto.PositionId);
 
             var employee = new Employee
             {

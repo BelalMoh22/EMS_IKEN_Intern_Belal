@@ -13,8 +13,8 @@
         {
             if(request.Id <= 0) 
                 throw new Exceptions.ValidationException(new() { "Id must be greater than 0." });
-            var employee = await _repo.GetByIdAsync(request.Id);
             
+            var employee = await _repo.GetByIdAsync(request.Id);
             if(employee == null)
                 throw new Exceptions.NotFoundException($"Employee with Id {request.Id} not found.");
 

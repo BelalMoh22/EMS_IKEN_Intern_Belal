@@ -12,11 +12,11 @@ namespace EmployeeService.Domain.Attributes
             ErrorMessage = $"Age must be at least {_minimumAge} years old.";
         }
 
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        protected override ValidationResult? IsValid(object value, ValidationContext validationContext)
         {
             if (value == null)
             {
-                return ValidationResult.Success!;
+                return ValidationResult.Success;
             }
 
             if (value is DateTime dateOfBirth)
@@ -24,16 +24,12 @@ namespace EmployeeService.Domain.Attributes
                 var age = DateTime.UtcNow.Year - dateOfBirth.Year;
 
                 if (DateTime.UtcNow < dateOfBirth.AddYears(age))
-                {
                     age--;
-                }
 
                 if (age < _minimumAge)
-                {
                     return new ValidationResult(ErrorMessage);
-                }
 
-                return ValidationResult.Success!;
+                return ValidationResult.Success;
             }
 
             return new ValidationResult("Invalid date format.");

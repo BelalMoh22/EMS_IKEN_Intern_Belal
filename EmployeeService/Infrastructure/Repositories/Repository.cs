@@ -3,7 +3,7 @@
     public abstract class Repository<T> : IRepository<T> where T : BaseEntity
     {
         protected readonly IDbConnectionFactory _connectionFactory;
-        protected readonly IDbConnection _connection; // changed to protected
+        protected readonly IDbConnection _connection;
         private readonly ILogger<Repository<T>> _logger;
 
         protected Repository(

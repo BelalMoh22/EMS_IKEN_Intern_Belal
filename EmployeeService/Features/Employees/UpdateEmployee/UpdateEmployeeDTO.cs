@@ -8,8 +8,7 @@
         [MaxLength(50)]
         public string? Lastname { get; set; }
 
-        [RegularExpression(@"^\d{14}$",
-            ErrorMessage = "National ID must be exactly 14 numbers.")]
+        [RegularExpression(@"^\d{14}$",ErrorMessage = "National ID must be exactly 14 numbers.")]
         public string? NationalId { get; set; }
 
         [EmailAddress(ErrorMessage = "Email must contain @ and be valid.")]

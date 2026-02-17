@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace EmployeeService.Domain.Common
+﻿namespace EmployeeService.Domain.Common
 {
     public static class ValidationHelper
     {
@@ -19,5 +17,4 @@ namespace EmployeeService.Domain.Common
             }
         }
     }
-
 }

@@ -23,11 +23,16 @@
             {
                 await HandleExceptionAsync(context, 404, new List<string> { ex.Message });
             }
+            //catch (Exception ex)
+            //{
+            //    await HandleExceptionAsync(context, 500, "Internal Server Error");
+            //}
             catch (Exception ex)
             {
                 await HandleExceptionAsync(context, 500,
                     new List<string> { ex.Message });
             }
+
         }
 
 

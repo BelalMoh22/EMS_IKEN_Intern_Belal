@@ -1,7 +1,4 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
-
-namespace EmployeeService.Features.Employees.UpdateEmployee
+﻿namespace EmployeeService.Features.Employees.UpdateEmployee
 {
     public static class UpdateEmployeeEndPoint
     {

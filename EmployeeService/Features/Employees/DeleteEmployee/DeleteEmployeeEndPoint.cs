@@ -8,7 +8,7 @@
             {
                 var command = new DeleteEmployeeCommand(id);
                 var result = await mediator.Send(command);
-                var response = ApiResponse<int>.SuccessResponse(id, "Employee deleted successfully");
+                var response = ApiResponse<int>.SuccessResponse("Employee deleted successfully");
                 return Results.Ok(response);
             }).WithName("DeleteEmployee").WithTags("Employees");
         }

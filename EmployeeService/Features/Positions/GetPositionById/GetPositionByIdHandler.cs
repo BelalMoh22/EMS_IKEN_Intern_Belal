@@ -11,7 +11,17 @@
 
         public async Task<Position?> Handle(GetPositionByIdQuery request, CancellationToken cancellationToken)
         {
-            return await _repo.GetByIdAsync(request.Id);
+            if(request.Id <= 0)
+            {
+                throw new Exceptions.ValidationException(new() {"Id must be greater than zero." });
+            }
+
+            var position = await _repo.GetByIdAsync(request.Id); 
+            if(position == null)
+            {
+                throw new Exceptions.NotFoundException($"Position with Id {request.Id} not found.");
+            }
+            return position;
         }
     }
 }

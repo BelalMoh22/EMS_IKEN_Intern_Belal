@@ -37,3 +37,5 @@ global using System.ComponentModel.DataAnnotations.Schema;
 global using EmployeeService.Domain.Attributes;
 global using EmployeeService.Infrastructure.BusinessRules.Employees;
 global using EmployeeService.Features.Employees;
+global using EmployeeService.Infrastructure.BusinessRules.Departments;
+global using EmployeeService.Infrastructure.BusinessRules.Positions;

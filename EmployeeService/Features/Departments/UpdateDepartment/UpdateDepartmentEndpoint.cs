@@ -8,7 +8,7 @@
             {
                 var command = new UpdateDepartmentCommand(id, dto);
                 var rows = await mediator.Send(command);
-                var response = ApiResponse<int>.SuccessResponse(id, "Department updated successfully");
+                var response = ApiResponse<int>.SuccessResponse("Department updated successfully");
                 return Results.Ok(response);
             }).WithDescription("Updating an existing Department").WithTags("Departments");
         }

@@ -8,7 +8,7 @@
             {
                 var command = new DeletePositionCommand(id);
                 var result = await mediator.Send(command);
-                var response = ApiResponse<int>.SuccessResponse(id, "Position deleted successfully");
+                var response = ApiResponse<int>.SuccessResponse("Position deleted successfully");
                 return Results.Ok(response);
             }).WithName("DeletePosition").WithTags("Positions");
         }

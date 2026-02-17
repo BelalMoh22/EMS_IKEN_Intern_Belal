@@ -8,7 +8,7 @@
             {
                 var command = new UpdatePositionCommand(id, dto);
                 var rows = await mediator.Send(command);
-                var response = ApiResponse<int>.SuccessResponse(id, "Position updated successfully");
+                var response = ApiResponse<int>.SuccessResponse("Position updated successfully");
                 return Results.Ok(response);
             }).WithDescription("Updating an existing Position").WithTags("Positions");
         }

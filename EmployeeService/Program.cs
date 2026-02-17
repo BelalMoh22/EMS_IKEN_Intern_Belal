@@ -16,14 +16,14 @@ namespace EmployeeService
             builder.Services.AddScoped<IRepository<Department>, DepartmentRepository>();
             builder.Services.AddScoped<IRepository<Position>, PositionRepository>();
             builder.Services.AddScoped<IEmployeeBusinessRules, EmployeeBusinessRules>();
+            builder.Services.AddScoped<IPositionBusinessRules, PositionBusinessRules>();
+            builder.Services.AddScoped<IDepartmentBusinessRules, DepartmentBusinessRules>();
             // Use Auth
             builder.Services.AddAuthorization();
 
-            // Add DbConnection and ApplicationName
             var appName = builder.Configuration["ApplicationSettings:ApplicationName"];
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-            // Register MediatR services
             builder.Services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
@@ -43,26 +43,16 @@ namespace EmployeeService
             {
                 app.Logger.LogCritical(ex, "Critical error during startup");
             }
-
-            // Log application name and connection string for debugging
-            //app.Logger.LogInformation("App Name: {AppName}", appName);
-            //app.Logger.LogInformation("Connection String: {ConnectionString}", connectionString);
-
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
             // Best Order for Middleware: Exception Handling, Logging, Authentication, Authorization
             app.UseMiddleware<GlobalExceptionMiddleware>();
             app.UseMiddleware<RequestLoggingMiddleware>();
             app.UseHttpsRedirection();
             app.UseAuthorization();
-
-            // /health endpoint 
-            //app.MapGet("/api/health", () => Results.Ok("First EndPoint From EMS"));
             app.MapGroup("/api/employees").MapEmployeesEndpoints();
             app.MapGroup("/api/departments").MapDepartmentEndpoints();
             app.MapGroup("/api/positions").MapPositionEndpoints();

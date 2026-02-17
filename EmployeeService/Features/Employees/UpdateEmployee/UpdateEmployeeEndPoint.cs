@@ -9,7 +9,7 @@
                 // ensure route id is used, not body
                 var command = new UpdateEmployeeCommand(id , dto);
                 var rows = await mediator.Send(command);
-                var response = ApiResponse<int>.SuccessResponse(id, "Employee updated successfully");
+                var response = ApiResponse<int>.SuccessResponse("Employee updated successfully");
                 return Results.Ok(response);
             }).WithDescription("Updating an existing Employee").WithTags("Employees");
         }

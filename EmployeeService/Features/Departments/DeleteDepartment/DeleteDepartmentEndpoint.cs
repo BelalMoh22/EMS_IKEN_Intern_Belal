@@ -8,7 +8,7 @@
             {
                 var command = new DeleteDepartmentCommand(id);
                 var result = await mediator.Send(command);
-                var response = ApiResponse<int>.SuccessResponse(id, "Department deleted successfully");
+                var response = ApiResponse<int>.SuccessResponse("Department deleted successfully");
                 return Results.Ok(response);
             }).WithName("DeleteDepartment").WithTags("Departments");
         }

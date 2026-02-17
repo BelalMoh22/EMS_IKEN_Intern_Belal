@@ -12,7 +12,7 @@
         public async Task<int> Handle(DeletePositionCommand request, CancellationToken cancellationToken)
         {
             if (request.id <= 0)
-                throw new Exceptions.ValidationException("Invalid position Id.");
+                throw new Exceptions.ValidationException(new() {"Invalid position Id." });
 
             var rows = await _repo.DeleteAsync(request.id);
             if (rows == 0)

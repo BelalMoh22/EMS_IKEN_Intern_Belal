@@ -13,11 +13,7 @@ namespace EmployeeService.Domain.Common
 
             if (!isValid)
             {
-                var errors = results
-                    .Select(r => r.ErrorMessage)
-                    .Where(msg => msg != null)
-                    .Cast<string>()
-                    .ToList();
+                var errors = results.Select(r => r.ErrorMessage).Where(msg => msg != null).Cast<string>().ToList();
 
                 throw new Exceptions.ValidationException(errors);
             }

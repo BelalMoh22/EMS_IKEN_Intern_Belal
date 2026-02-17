@@ -4,11 +4,12 @@
     {
         public static void MapEndpoint(this IEndpointRouteBuilder app)
         {
-            app.MapPost("/", async ([FromBody] CreatePositionCommand command, [FromServices] IMediator mediator) =>
+            app.MapPost("/", async ([FromBody] CreatePositionDto dto, [FromServices] IMediator mediator) =>
             {
+                var command = new CreatePositionCommand(dto);
                 var id = await mediator.Send(command);
 
-                var response = ApiResponse<int>.SuccessResponse(id, "Position created successfully");
+                var response = ApiResponse<int>.SuccessResponse("Position created successfully");
 
                 return Results.Created($"/position/{id}", response);
             }).WithName("CreatePosition").WithTags("Positions");

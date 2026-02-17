@@ -11,7 +11,14 @@
 
         public async Task<Department?> Handle(GetDepartmentByIdQuery request, CancellationToken cancellationToken)
         {
-            return await _repo.GetByIdAsync(request.Id);
+            if (request.Id <= 0)
+                throw new Exceptions.ValidationException(new() { "Id must be greater than 0." });
+            
+            var department = await _repo.GetByIdAsync(request.Id); 
+            if (department == null)
+                throw new Exceptions.NotFoundException($"Department with Id {request.Id} not found.");
+
+            return department;
         }
     }
 }

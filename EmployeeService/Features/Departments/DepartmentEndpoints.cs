@@ -1,6 +1,6 @@
 ﻿namespace EmployeeService.Features.Departments
 {
-    public static class DepartmentEndpoint
+    public static class DepartmentEndpoints
     {
         public static void MapDepartmentEndpoints(this IEndpointRouteBuilder app)
         {

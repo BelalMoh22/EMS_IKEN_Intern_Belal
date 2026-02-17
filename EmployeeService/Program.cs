@@ -1,6 +1,3 @@
-using EmployeeService.Features.Departments;
-using EmployeeService.Features.Employees;
-
 namespace EmployeeService
 {
     public class Program
@@ -72,6 +69,7 @@ namespace EmployeeService
             //app.MapGet("/api/health", () => Results.Ok("First EndPoint From EMS"));
             app.MapGroup("/api/employees").MapEmployeesEndpoints();
             app.MapGroup("/api/departments").MapDepartmentEndpoints();
+            app.MapGroup("/api/positions").MapPositionEndpoints();
 
             app.Run();
         }

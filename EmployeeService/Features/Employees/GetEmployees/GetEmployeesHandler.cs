@@ -1,5 +1,4 @@
-﻿
-namespace EmployeeService.Features.Employees.GetEmployees
+﻿namespace EmployeeService.Features.Employees.GetEmployees
 {
     public class GetEmployeesHandler : IRequestHandler<GetEmployeesQuery, IEnumerable<Employee>>
     {

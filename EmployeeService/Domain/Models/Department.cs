@@ -2,10 +2,28 @@
 {
     public class Department : BaseEntity
     {
-        public string DepartmentName { get; set; }
+        private Department() { }
 
-        public int ManagerId { get; set; }
+        public string DepartmentName { get; private set; }
+        public string? Description { get; private set; } = string.Empty;
+        public string Email { get; private set; }
+        public int ManagerId { get; private set; }
+        public bool? IsActive { get; private set; } = true;
 
-        public bool? IsActive { get; set; } = true;
+        public Department(string departmentName, string? description, string email, int managerId)
+        {
+            DepartmentName = departmentName;
+            Description = description;
+            Email = email;
+            ManagerId = managerId;
+        }
+
+        public void Update(string? departmentName, string? description, string? email, int? managerId)
+        {
+            DepartmentName = departmentName ?? DepartmentName;
+            Description = description ?? Description;
+            Email = email ?? Email;
+            ManagerId = managerId ?? ManagerId;
+        }
     }
 }

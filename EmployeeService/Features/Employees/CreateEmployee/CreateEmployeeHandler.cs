@@ -12,30 +12,23 @@
             _rules = rules;
         }
 
-        public async Task<int> Handle(CreateEmployeeCommand request,CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
         {
             var dto = request.dto;
-            if (dto == null)
-                throw new Exceptions.ValidationException(new() { "Employee data is required." });
+            await _rules.ValidateForCreateAsync(dto);
 
-            ValidationHelper.ValidateModel(dto);
-            await _rules.ValidateAsync(null, dto.Email,dto.NationalId,dto.Salary,dto.PositionId);
-
-            var employee = new Employee
-            {
-                FirstName = dto.FirstName,
-                Lastname = dto.Lastname,
-                NationalId = dto.NationalId,
-                Email = dto.Email,
-                PhoneNumber = dto.PhoneNumber,
-                DateOfBirth = dto.DateOfBirth,
-                Address = dto.Address,
-                Salary = dto.Salary,
-                HireDate = dto.HireDate ?? DateTime.UtcNow,
-                Status = dto.Status ?? EmployeeStatus.Active,
-                PositionId = dto.PositionId,
-                CreatedAt = DateTime.UtcNow
-            };
+            var employee = new Employee(
+                dto.FirstName,
+                dto.Lastname,
+                dto.NationalId,
+                dto.Email,
+                dto.PhoneNumber,
+                dto.DateOfBirth,
+                dto.Address,
+                dto.Salary,
+                dto.PositionId,
+                dto.Status
+            );
 
             return await _repo.AddAsync(employee);
         }

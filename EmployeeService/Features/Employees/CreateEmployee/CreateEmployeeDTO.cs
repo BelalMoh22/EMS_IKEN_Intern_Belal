@@ -11,7 +11,7 @@
         public string Lastname { get; set; }
 
         [Required(ErrorMessage = "National ID is required.")]
-        [RegularExpression(@"^\d{14}$",ErrorMessage = "National ID must be exactly 14 numbers.")]
+        [RegularExpression(@"^\d{14}$", ErrorMessage = "National ID must be exactly 14 numbers.")]
         public string NationalId { get; set; }
 
         [Required(ErrorMessage = "Email is required.")]
@@ -19,27 +19,30 @@
         public string Email { get; set; }
 
         [Required(ErrorMessage = "Phone Number is required.")]
-        public int PhoneNumber { get; set; }
+        public string PhoneNumber { get; set; } 
 
         [Required(ErrorMessage = "Date of Birth is required.")]
         [MinimumAge(18)]
+        [MaximumAge(60)]
         [NotFutureDate(ErrorMessage = "Date of Birth cannot be in the future.")]
         [DataType(DataType.Date)]
         public DateTime DateOfBirth { get; set; }
 
-        [MaxLength(200)]
+        [Required(ErrorMessage = "Address is required.")] 
+        [MaxLength(200)] 
         public string Address { get; set; }
 
+        [Required(ErrorMessage = "Salary is required.")]
         public decimal Salary { get; set; }
 
         [NotFutureDate(ErrorMessage = "Hire Date cannot be in the future.")]
         [DataType(DataType.Date)]
         public DateTime? HireDate { get; set; }
 
-        [Required(ErrorMessage = "Status is required.")]
         public EmployeeStatus? Status { get; set; }
 
         [Required(ErrorMessage = "PositionId is required.")]
+        [ForeignKey("Position")]
         public int PositionId { get; set; }
     }
 }

@@ -48,6 +48,13 @@
             return await SoftDeleteAsync(id);
         }
 
+        public async Task<bool> ExistsAsync(string condition, object? parameters = null)
+        {
+            var sql = $"SELECT 1 FROM {TableName} WHERE {condition}";
+            var result = await _connection.QueryFirstOrDefaultAsync<int?>(sql, parameters);
+            return result.HasValue;
+        }
+
         public abstract Task<int> AddAsync(T entity);
         public abstract Task<int> UpdateAsync(int id, T entity);
     }

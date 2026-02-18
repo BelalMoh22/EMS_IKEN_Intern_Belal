@@ -7,5 +7,7 @@
         Task<int> AddAsync(T entity);
         Task<int> UpdateAsync(int id , T entity);
         Task<int> DeleteAsync(int id);
+
+        Task<bool> ExistsAsync(string condition, object? parameters = null);
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace EmployeeService.Features.Departments.UpdateDepartment
+﻿using EmployeeService.Domain.Models;
+
+namespace EmployeeService.Features.Departments.UpdateDepartment
 {
     public class UpdateDepartmentHandler : IRequestHandler<UpdateDepartmentCommand, int>
     {
@@ -13,23 +15,24 @@
 
         public async Task<int> Handle(UpdateDepartmentCommand request, CancellationToken cancellationToken)
         {
-            if (request.id <= 0)
+            if (request.Id <= 0)
                 throw new Exceptions.ValidationException(new() {"Invalid department Id." });
 
-            var existingDepartment = await _repo.GetByIdAsync(request.id);
+            var existingDepartment = await _repo.GetByIdAsync(request.Id);
             if (existingDepartment == null)
-                throw new NotFoundException($"Department with Id {request.id} not found.");
+                throw new NotFoundException($"Department with Id {request.Id} not found.");
 
-            ValidationHelper.ValidateModel(request.dto);
+            var dto = request.dto;
+            await _rules.ValidateForUpdateAsync(request.Id, dto, existingDepartment);
 
-            var effectiveManagerId = request.dto.ManagerId != 0 ? request.dto.ManagerId : existingDepartment.ManagerId;
-            await _rules.ValidateAsync(effectiveManagerId);
+            existingDepartment.Update(
+                dto.DepartmentName,
+                dto.Description,
+                dto.Email,
+                dto.ManagerId
+            );
 
-            existingDepartment.DepartmentName = request.dto.DepartmentName ?? existingDepartment.DepartmentName;
-            existingDepartment.ManagerId = effectiveManagerId;
-
-            var rows = await _repo.UpdateAsync(request.id, existingDepartment);
-            return rows;
+            return await _repo.UpdateAsync(request.Id, existingDepartment);
         }
     }
 }

@@ -10,7 +10,6 @@
         [Required(ErrorMessage = "Max salary is required.")]
         [Range(0, double.MaxValue, ErrorMessage = "Max salary must be a positive number.")]
         public decimal MaxSalary { get; set; }
-
         [Required(ErrorMessage = "Department ID is required.")]
         public int DepartmentId { get; set; }
     }

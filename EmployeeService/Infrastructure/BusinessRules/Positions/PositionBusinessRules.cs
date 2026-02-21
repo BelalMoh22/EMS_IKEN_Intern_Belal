@@ -1,83 +1,94 @@
-
-using EmployeeService.Infrastructure.Repositories;
-
-namespace EmployeeService.Infrastructure.BusinessRules.Positions
+﻿namespace EmployeeService.Infrastructure.BusinessRules.Positions
 {
-    public class PositionBusinessRules : IPositionBusinessRules
+    public sealed class PositionBusinessRules : IPositionBusinessRules
     {
         private readonly IRepository<Position> _positionRepository;
         private readonly IRepository<Department> _departmentRepository;
+        private readonly IRepository<Employee> _employeeRepository;
 
-        public PositionBusinessRules(IRepository<Position> positionRepository, IRepository<Department> departmentRepository)
+        public PositionBusinessRules(IRepository<Position> positionRepository,IRepository<Department> departmentRepository,IRepository<Employee> employeeRepository)
         {
             _positionRepository = positionRepository;
             _departmentRepository = departmentRepository;
+            _employeeRepository = employeeRepository;
         }
-
-        //public async Task ValidateAsync(decimal minSalary, decimal maxSalary, int departmentId)
-        //{
-        //    if (maxSalary <= minSalary)
-        //        throw new Exceptions.ValidationException(new() {"Max salary must be greater than min salary."});
-
-        //    var department = await _departmentRepository.GetByIdAsync(departmentId);
-        //    if (department == null)
-        //        throw new Exceptions.ValidationException(new() {$"Department with Id {departmentId} does not exist."});
-        //}
 
         public async Task ValidateForCreateAsync(CreatePositionDto dto)
         {
             var errors = new List<string>();
             errors.AddRange(ValidationHelper.ValidateModel(dto));
 
-            var positionNameExists = await _positionRepository.ExistsAsync("PositionName = @PositionName", new { dto.PositionName });
-            if (positionNameExists)
-                errors.Add($"Position Name '{dto.PositionName}' is already in use.");
+            var nameExists = await _positionRepository.ExistsAsync("PositionName = @PositionName",new { dto.PositionName });
+            if (nameExists)
+                errors.Add($"Position name '{dto.PositionName}' already exists.");
 
             if (dto.MaxSalary <= dto.MinSalary)
                 errors.Add("Max salary must be greater than min salary.");
 
-            if (dto.MinSalary < 0 || dto.MaxSalary < 0)
-                errors.Add("Salaries must be positive numbers.");
-
             if (dto.DepartmentId <= 0)
+            {
                 errors.Add("DepartmentId must be a positive number.");
-
-            var departmentExists = await _departmentRepository.ExistsAsync("Id = @DepartmentId", new { dto.DepartmentId });
-            if (!departmentExists)
-                errors.Add($"Department with Id {dto.DepartmentId} does not exist.");
+            }
+            else
+            {
+                var departmentExists = await _departmentRepository.ExistsAsync("Id = @DepartmentId", new { dto.DepartmentId });
+                if (!departmentExists)
+                    errors.Add($"Department with Id {dto.DepartmentId} does not exist.");
+            }
 
             if (errors.Any())
                 throw new Exceptions.ValidationException(errors);
         }
 
-        public async Task ValidateForUpdateAsync(int positionId, UpdatePositionDto dto, Position existingPosition)
+        public async Task ValidateForUpdateAsync(int positionId,UpdatePositionDto dto,Position existingPosition)
         {
             var errors = new List<string>();
-            errors.AddRange(ValidationHelper.ValidateModel(dto));
 
-            var effectivePositionName = dto.PositionName ?? existingPosition.PositionName;
-            var effectiveMinSalary = dto.MinSalary != 0 ? dto.MinSalary : existingPosition.MinSalary;
-            var effectiveMaxSalary = dto.MaxSalary != 0 ? dto.MaxSalary : existingPosition.MaxSalary;
-            var effectiveDepartmentId = dto.DepartmentId != 0 ? dto.DepartmentId : existingPosition.DepartmentId;
+            var effectiveName =dto.PositionName ?? existingPosition.PositionName;
 
-            var positionNameExists = await _positionRepository.ExistsAsync(
+            var effectiveMinSalary =dto.MinSalary ?? existingPosition.MinSalary;
+
+            var effectiveMaxSalary =dto.MaxSalary ?? existingPosition.MaxSalary;
+
+            var effectiveDepartmentId =dto.DepartmentId ?? existingPosition.DepartmentId;
+
+            var nameExists = await _positionRepository.ExistsAsync(
                 "PositionName = @PositionName AND Id != @Id",
-                new { PositionName = effectivePositionName, Id = positionId });
-            if (positionNameExists)
-                errors.Add($"Position Name '{effectivePositionName}' is already in use.");
-
-            if (effectiveMaxSalary <= effectiveMinSalary)
-                errors.Add("Max salary must be greater than min salary.");
+                new { PositionName = effectiveName, Id = positionId });
+            if (nameExists)
+                errors.Add($"Position name '{effectiveName}' already exists.");
 
             if (effectiveMinSalary < 0 || effectiveMaxSalary < 0)
                 errors.Add("Salaries must be positive numbers.");
 
-            if (effectiveDepartmentId <= 0)
-                errors.Add("DepartmentId must be a positive number.");
+            if (effectiveMaxSalary <= effectiveMinSalary)
+                errors.Add("Max salary must be greater than min salary.");
 
-            var departmentExists = await _departmentRepository.ExistsAsync("Id = @DepartmentId", new { DepartmentId = effectiveDepartmentId });
-            if (!departmentExists)
-                errors.Add($"Department with Id {effectiveDepartmentId} does not exist.");
+            if (effectiveDepartmentId <= 0)
+            {
+                errors.Add("DepartmentId must be a positive number.");
+            }
+            else
+            {
+                var departmentExists = await _departmentRepository.ExistsAsync(
+                    "Id = @DepartmentId",
+                    new { DepartmentId = effectiveDepartmentId });
+
+                if (!departmentExists)
+                    errors.Add($"Department with Id {effectiveDepartmentId} does not exist.");
+            }
+
+            if (errors.Any())
+                throw new Exceptions.ValidationException(errors);
+        }
+
+        public async Task ValidateForDeleteAsync(int positionId)
+        {
+            var errors = new List<string>();
+
+            var isAssignedToEmployees = await _employeeRepository.ExistsAsync("PositionId = @PositionId",new { PositionId = positionId });
+            if (isAssignedToEmployees)
+                errors.Add("Cannot delete position because it is assigned to one or more employees.");
 
             if (errors.Any())
                 throw new Exceptions.ValidationException(errors);

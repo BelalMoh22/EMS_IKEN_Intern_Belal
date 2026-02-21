@@ -16,13 +16,7 @@
             var dto = request.dto;
             await _rules.ValidateForCreateAsync(dto);
 
-            var Department = new Department(
-                dto.DepartmentName,
-                dto.Description,
-                dto.Email,
-                dto.ManagerId
-            );
-
+            var Department = new Department(dto.DepartmentName,dto.Description,dto.Email,dto.ManagerId);
             return await _repo.AddAsync(Department);
         }
     }

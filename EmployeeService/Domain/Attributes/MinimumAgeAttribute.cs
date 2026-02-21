@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace EmployeeService.Domain.Attributes
 {
     public class MinimumAgeAttribute : ValidationAttribute
@@ -31,7 +29,6 @@ namespace EmployeeService.Domain.Attributes
 
                 return ValidationResult.Success;
             }
-
             return new ValidationResult("Invalid date format.");
         }
     }

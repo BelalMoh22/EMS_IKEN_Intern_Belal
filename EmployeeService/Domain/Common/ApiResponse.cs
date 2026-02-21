@@ -14,7 +14,6 @@
                 Message = message,
             };
         }
-
         public static ApiResponse<T> FailureResponse(IEnumerable<string> errors, string message = "")
         {
             return new ApiResponse<T>

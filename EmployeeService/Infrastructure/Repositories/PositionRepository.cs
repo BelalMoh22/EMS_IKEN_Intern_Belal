@@ -17,7 +17,7 @@
                 (@PositionName, @MinSalary, @MaxSalary, @DepartmentId);
 
             SELECT CAST(SCOPE_IDENTITY() AS INT);
-        ";
+            ";
 
             return await _connection.ExecuteScalarAsync<int>(sql, position);
         }

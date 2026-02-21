@@ -28,7 +28,7 @@ namespace EmployeeService
             cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
             var app = builder.Build();
-            // Log application startup information
+
             app.Logger.LogTrace("Application is starting (Trace)");
             app.Logger.LogInformation("Application started successfully (Information)");
             app.Logger.LogWarning("This is a sample warning during startup (Warning)");

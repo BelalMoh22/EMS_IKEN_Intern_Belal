@@ -6,9 +6,7 @@
         protected readonly IDbConnection _connection;
         private readonly ILogger<Repository<T>> _logger;
 
-        protected Repository(
-            IDbConnectionFactory connectionFactory,
-            ILogger<Repository<T>> logger)
+        protected Repository(IDbConnectionFactory connectionFactory,ILogger<Repository<T>> logger)
         {
             _connectionFactory = connectionFactory;
             _logger = logger;

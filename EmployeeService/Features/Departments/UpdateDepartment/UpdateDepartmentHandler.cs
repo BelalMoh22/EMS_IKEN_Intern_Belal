@@ -12,7 +12,6 @@ namespace EmployeeService.Features.Departments.UpdateDepartment
             _repo = repo;
             _rules = rules;
         }
-
         public async Task<int> Handle(UpdateDepartmentCommand request, CancellationToken cancellationToken)
         {
             if (request.Id <= 0)
@@ -29,7 +28,8 @@ namespace EmployeeService.Features.Departments.UpdateDepartment
                 dto.DepartmentName,
                 dto.Description,
                 dto.Email,
-                dto.ManagerId
+                dto.ManagerId,
+                dto.IsActive
             );
 
             return await _repo.UpdateAsync(request.Id, existingDepartment);

@@ -11,17 +11,26 @@
 
         public async Task<int> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
-            var exists = await _userRepository.ExistsAsync("Username = @Username AND IsDeleted = 0",new { request.UserName });
+            var errors = new List<string>();
+            errors.AddRange(ValidationHelper.ValidateModel(request.dto));
 
+            if (!Enum.IsDefined(typeof(Roles), request.dto.Role))
+                    errors.Add("Invalid role value.");
+
+            var exists = await _userRepository.ExistsAsync("Username = @Username AND IsDeleted = 0",new { request.dto.Username });
             if (exists)
-                throw new Exception("Username already exists.");
+                errors.Add("Username already exists.");
 
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.Password);
+            if (errors.Any())
+                throw new Exceptions.ValidationException(errors);
+
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(request.dto.Password);
 
             var user = new User
             {
-                Username = request.UserName,
-                PasswordHash = hashedPassword,  
+                Username = request.dto.Username,
+                PasswordHash = hashedPassword,
+                Role = request.dto.Role
             };
 
             return await _userRepository.AddAsync(user);

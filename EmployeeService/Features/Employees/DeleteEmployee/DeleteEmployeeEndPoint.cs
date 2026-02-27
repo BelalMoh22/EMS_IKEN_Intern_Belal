@@ -10,7 +10,7 @@
                 var result = await mediator.Send(command);
                 var response = ApiResponse<int>.SuccessResponse("Employee deleted successfully");
                 return Results.Ok(response);
-            }).WithName("DeleteEmployee").WithTags("Employees");
+            }).WithName("DeleteEmployee").WithTags("Employees").RequireAuthorization("FullCRUDEmployee");
 
             return app;
         }

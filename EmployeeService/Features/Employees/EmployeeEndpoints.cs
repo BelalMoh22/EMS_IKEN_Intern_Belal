@@ -4,11 +4,11 @@
     {
         public static RouteGroupBuilder MapEmployeesEndpoints(this RouteGroupBuilder group)
         {
-            GetEmployeesEndpoint.MapEndpoint(group);
-            GetEmployeeByIdEndpoint.MapEndpoint(group);
             CreateEmployeeEndPoint.MapEndpoint(group);
             UpdateEmployeeEndPoint.MapEndpoint(group);
             DeleteEmployeeEndPoint.MapEndpoint(group);
+            GetEmployeesEndpoint.MapEndpoint(group);
+            GetEmployeeByIdEndpoint.MapEndpoint(group);
 
             return group;
         }

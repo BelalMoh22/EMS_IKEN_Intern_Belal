@@ -4,11 +4,12 @@
     {
         public static RouteGroupBuilder MapEndpoint(this RouteGroupBuilder app)
         {
-            app.MapPost("/register",async (RegisterCommand command, IMediator mediator) =>
-                {
-                    var userId = await mediator.Send(command);
-                    return Results.Ok(new { userId });
-                }).WithTags("Auth");
+            app.MapPost("/register",async (RegisterDto dto, IMediator mediator) =>
+            {
+                var command = new RegisterCommand(dto);
+                var userId = await mediator.Send(command);
+                return Results.Ok(new { userId });
+            }).WithTags("Auth");
 
             return app;
         }

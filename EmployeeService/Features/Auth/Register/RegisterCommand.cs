@@ -1,4 +1,4 @@
 ﻿namespace EmployeeService.Features.Auth.Register
 {
-    public record RegisterCommand(string UserName , string Password) :IRequest<int>;
+    public record RegisterCommand(RegisterDto dto) :IRequest<int>;
 }

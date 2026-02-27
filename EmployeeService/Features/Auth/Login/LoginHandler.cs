@@ -13,12 +13,17 @@
 
         public async Task<string> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userRepository.GetByUsernameAsync(request.UserName);
+            var errors = new List<string>();
+            errors.AddRange(ValidationHelper.ValidateModel(request.dto));
 
+            if (errors.Any())
+                throw new Exceptions.ValidationException(errors);
+
+            var user = await _userRepository.GetByUsernameAsync(request.dto.Username);
             if (user is null)
                 throw new UnauthorizedAccessException("Invalid UserName or Password.");
 
-            var isValid = BCrypt.Net.BCrypt.Verify(request.Password,user.PasswordHash); // here we are comparing the provided password with the stored password hash using BCrypt's Verify method.
+            var isValid = BCrypt.Net.BCrypt.Verify(request.dto.Password, user.PasswordHash);
 
             if (!isValid)
                 throw new UnauthorizedAccessException("Invalid UserName or Password.");

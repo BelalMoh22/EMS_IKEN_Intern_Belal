@@ -9,7 +9,7 @@
                 var command = new GetEmployeesQuery();
                 var result = await mediator.Send(command);
                 return Results.Ok(result);
-            }).WithName("GetEmployees").WithTags("Employees");
+            }).WithName("GetEmployees").WithTags("Employees").RequireAuthorization("EmployeesReadOnly");
 
             return app;
         }

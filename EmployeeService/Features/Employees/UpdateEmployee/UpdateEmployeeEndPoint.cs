@@ -10,7 +10,7 @@
                 var rows = await mediator.Send(command);
                 var response = ApiResponse<int>.SuccessResponse("Employee updated successfully");
                 return Results.Ok(response);
-            }).WithDescription("Updating an existing Employee").WithTags("Employees");
+            }).WithDescription("Updating an existing Employee").WithTags("Employees").RequireAuthorization("FullCRUDEmployee");
 
             return app;
         }

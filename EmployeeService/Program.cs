@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 namespace EmployeeService
 {
     public class Program
@@ -36,11 +35,27 @@ namespace EmployeeService
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = config["Jwt:Issuer"],
                         ValidAudience = config["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]))
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"])),
                     };
                 });
             // Use Authorization
-            builder.Services.AddAuthorization();
+            builder.Services.AddAuthorization( builder =>
+            {
+                builder.AddPolicy("FullCRUD", context =>
+                {
+                    context.RequireRole(Roles.Admin.ToString());
+                });
+
+                builder.AddPolicy("EmployeesReadOnly", context =>
+                {
+                    context.RequireRole(Roles.HR.ToString(), Roles.Admin.ToString(), Roles.Manager.ToString());
+                });
+
+                builder.AddPolicy("FullCRUDEmployee", context =>
+                {
+                    context.RequireRole(Roles.HR.ToString(), Roles.Admin.ToString());
+                });
+            });
 
             var appName = builder.Configuration["ApplicationSettings:ApplicationName"];
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -77,9 +92,9 @@ namespace EmployeeService
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapGroup("/api/auth").MapAuthEndpoints();
-            app.MapGroup("/api/employees").MapEmployeesEndpoints().RequireAuthorization();
-            app.MapGroup("/api/departments").MapDepartmentEndpoints().RequireAuthorization();
-            app.MapGroup("/api/positions").MapPositionEndpoints().RequireAuthorization();
+            app.MapGroup("/api/employees").MapEmployeesEndpoints();
+            app.MapGroup("/api/departments").MapDepartmentEndpoints().RequireAuthorization("FullCRUD");
+            app.MapGroup("/api/positions").MapPositionEndpoints().RequireAuthorization("FullCRUD");
 
             app.Run();
         }

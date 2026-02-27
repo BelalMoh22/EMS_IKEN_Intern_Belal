@@ -4,10 +4,8 @@
     {
         protected override string TableName => "Users";
 
-        public UserRepository(
-            IDbConnectionFactory connectionFactory,
-            ILogger<Repository<User>> logger)
-            : base(connectionFactory, logger)
+        public UserRepository(IDbConnectionFactory connectionFactory,ILogger<Repository<User>> logger)
+        : base(connectionFactory, logger)
         {
         }
 
@@ -15,9 +13,9 @@
         {
             var sql = $@"
             INSERT INTO {TableName}
-            (Username, PasswordHash)
+            (Username, PasswordHash, Role)
             VALUES
-            (@Username, @PasswordHash);
+            (@Username, @PasswordHash, @Role);
 
             SELECT CAST(SCOPE_IDENTITY() as int);";
 
@@ -30,6 +28,7 @@
             UPDATE {TableName}
             SET Username = @Username,
                 PasswordHash = @PasswordHash,
+                Role = @Role
             WHERE Id = @Id";
 
             return await _connection.ExecuteAsync(sql, new
@@ -37,6 +36,7 @@
                 Id = id,
                 entity.Username,
                 entity.PasswordHash,
+                entity.Role
             });
         }
 

@@ -4,10 +4,11 @@
     {
         public static RouteGroupBuilder MapEndpoint(this RouteGroupBuilder app)
         {
-            app.MapPost("/login",async (LoginCommand command, IMediator mediator) =>
+            app.MapPost("/login",async (LoginDto dto, IMediator mediator) =>
             {
-                    var token = await mediator.Send(command);
-                    return Results.Ok(new { token });
+                var command = new LoginCommand(dto);
+                var token = await mediator.Send(command);
+                return Results.Ok(new { token });
             }).WithTags("Auth");
 
             return app;

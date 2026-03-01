@@ -34,13 +34,19 @@
 
         public async Task<int> SoftDeleteAsync(int id)
         {
-            var sql = $"UPDATE {TableName} SET IsDeleted = 1 WHERE Id = @Id";
+            var sql = $@"
+                UPDATE {TableName}
+                SET IsDeleted = 1
+                WHERE Id = @Id AND IsDeleted = 0";
+
+            var affected = await _connection.ExecuteAsync(sql, new { Id = id });
+
+            if (affected == 0)
+                throw new Exceptions.ValidationException( new() { $"Employee with Id {id} does not exist or is already inactive." });
 
             _logger.LogDebug("Executing SOFT DELETE for Id {Id}", id);
-
-            return await _connection.ExecuteAsync(sql, new { Id = id });
+            return affected;
         }
-
         public async Task<int> DeleteAsync(int id)
         {
             return await SoftDeleteAsync(id);

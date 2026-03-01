@@ -32,7 +32,7 @@
             {
                 manager = await _employeeRepository.GetByIdAsync(dto.ManagerId.Value);
                 if (manager == null)
-                    errors.Add($"Manager with Id {dto.ManagerId.Value} does not exist.");
+                    errors.Add($"Employee with Id {dto.ManagerId.Value} does not exist.");
 
                 var managerAlreadyAssigned = await _departmentRepository.ExistsAsync("ManagerId = @ManagerId", new { ManagerId = dto.ManagerId.Value });
                 if (managerAlreadyAssigned)
@@ -65,7 +65,7 @@
             {
                 manager = await _employeeRepository.GetByIdAsync(effectiveManagerId.Value);
                 if (manager == null)
-                    errors.Add($"Manager with Id {effectiveManagerId.Value} does not exist.");
+                    errors.Add($"Employee with Id {effectiveManagerId.Value} does not exist.");
 
                 var managerAlreadyAssigned = await _departmentRepository.ExistsAsync(
                     "ManagerId = @ManagerId AND Id != @DepartmentId",

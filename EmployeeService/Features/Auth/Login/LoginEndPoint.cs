@@ -6,7 +6,7 @@
         {
             app.MapPost("/login",async (LoginDto dto, IMediator mediator) =>
             {
-                var command = new LoginCommand(dto);
+                var command = new RefreshCommand(dto);
                 var token = await mediator.Send(command);
                 return Results.Ok(new { token });
             }).WithTags("Auth");

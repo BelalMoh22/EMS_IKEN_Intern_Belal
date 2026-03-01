@@ -1,4 +1,6 @@
-﻿namespace EmployeeService.Infrastructure.Security
+﻿using System.Security.Cryptography;
+
+namespace EmployeeService.Infrastructure.Security
 {
     public class JwtTokenGenerator : IJwtTokenGenerator
     {
@@ -26,11 +28,19 @@
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(double.Parse(_configuration["Jwt:DurationInMinutes"] ?? "60")),
+                expires: DateTime.UtcNow.AddMinutes(double.Parse(_configuration["Jwt:DurationInMinutes"])),
                 signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string GenerateRefreshToken()
+        {
+            var randomBytes = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomBytes);
+            return Convert.ToBase64String(randomBytes);
         }
     }
 }

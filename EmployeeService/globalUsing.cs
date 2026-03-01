@@ -47,3 +47,4 @@ global using EmployeeService.Features.Auth.Register;
 global using EmployeeService.Infrastructure.Security;
 global using EmployeeService.Features.Auth;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using Microsoft.OpenApi.Models;

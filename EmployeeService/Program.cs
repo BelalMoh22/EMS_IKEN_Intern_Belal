@@ -1,4 +1,4 @@
-namespace EmployeeService
+﻿namespace EmployeeService
 {
     public class Program
     {
@@ -10,7 +10,40 @@ namespace EmployeeService
 
             // Add services to the container(DI).
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Enter JWT Token like: your token"
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+            });
+
+            builder.Services.AddScoped<IDbConnection>(sp =>
+            {
+                var factory = sp.GetRequiredService<IDbConnectionFactory>();
+                return factory.CreateConnection();
+            });
             builder.Services.AddScoped<IDbConnectionFactory, SqlConnectionFactory>();
             builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
             builder.Services.AddScoped<IRepository<Employee>, EmployeeRepository>();
@@ -20,23 +53,25 @@ namespace EmployeeService
             builder.Services.AddScoped<IEmployeeBusinessRules, EmployeeBusinessRules>();
             builder.Services.AddScoped<IPositionBusinessRules, PositionBusinessRules>();
             builder.Services.AddScoped<IDepartmentBusinessRules, DepartmentBusinessRules>();
+            builder.Services.AddScoped<IRefreshTokenRepository,RefreshTokenRepository>();
 
             // Use Authentication
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
-                    var config = builder.Configuration;
-
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
                         ValidateAudience = true,
-                        ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = config["Jwt:Issuer"],
-                        ValidAudience = config["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"])),
-                        RoleClaimType = ClaimTypes.Role
+                        ValidateLifetime = true, 
+
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
+                        ),
+                        ClockSkew = TimeSpan.Zero 
                     };
                 });
             // Use Authorization

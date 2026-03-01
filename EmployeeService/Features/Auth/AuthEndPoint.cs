@@ -1,4 +1,6 @@
-﻿namespace EmployeeService.Features.Auth
+﻿using EmployeeService.Features.Auth.Refresh;
+
+namespace EmployeeService.Features.Auth
 {
     public static class AuthEndPoint
     {
@@ -6,6 +8,7 @@
         {
             RegisterEndpoint.MapEndpoint(group);
             LoginEndpoint.MapEndpoint(group);
+            RefreshEndpoint.MapEndpoint(group);
             return group;
         }
     }

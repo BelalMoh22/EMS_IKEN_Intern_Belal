@@ -23,6 +23,10 @@
             {
                 await HandleExceptionAsync(context, 404, new List<string> { ex.Message });
             }
+            catch (UnauthorizedAccessException ex)
+            {
+                await HandleExceptionAsync(context, 403, new List<string> { ex.Message });
+            }
             catch (Exception ex)
             {
                 await HandleExceptionAsync(context, 500,

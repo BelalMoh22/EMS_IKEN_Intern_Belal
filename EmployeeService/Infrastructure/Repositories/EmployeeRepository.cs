@@ -2,9 +2,7 @@
 {
     public class EmployeeRepository : Repository<Employee>
     {
-        public EmployeeRepository(
-            IDbConnectionFactory connectionFactory,
-            ILogger<Repository<Employee>> logger)
+        public EmployeeRepository(IDbConnectionFactory connectionFactory,ILogger<Repository<Employee>> logger)
             : base(connectionFactory, logger)
         {
         }

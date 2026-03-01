@@ -36,6 +36,7 @@ namespace EmployeeService
                         ValidIssuer = config["Jwt:Issuer"],
                         ValidAudience = config["Jwt:Audience"],
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"])),
+                        RoleClaimType = ClaimTypes.Role
                     };
                 });
             // Use Authorization
@@ -57,28 +58,16 @@ namespace EmployeeService
                 });
             });
 
-            var appName = builder.Configuration["ApplicationSettings:ApplicationName"];
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
+            // Inject MediatR into DI Container
             builder.Services.AddMediatR(cfg =>
             cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
-            var app = builder.Build();
+            var appName = builder.Configuration["ApplicationSettings:ApplicationName"];
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-            app.Logger.LogTrace("Application is starting (Trace)");
+            var app = builder.Build();
             app.Logger.LogInformation("Application started successfully (Information)");
-            app.Logger.LogWarning("This is a sample warning during startup (Warning)");
-            try
-            {
-                if (string.IsNullOrEmpty(builder.Configuration.GetConnectionString("DefaultConnection")))
-                {
-                    throw new Exception("Connection string missing");
-                }
-            }
-            catch (Exception ex)
-            {
-                app.Logger.LogCritical(ex, "Critical error during startup");
-            }
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();

@@ -43,7 +43,7 @@ namespace backend.Features.Employees.DeleteEmployee
             var message = rows > 0 ? "Employee deleted successfully." : "No employee was deleted.";
             if (!string.IsNullOrEmpty(deptName))
             {
-                message += $" Note: Manager '{employee.FirstName} {employee.Lastname}' was removed from department '{deptName}'. Please assign a new manager.";
+                message += $" Important: This employee was designated as the Manager for the '{deptName}' department. Upon deletion, the department manager position is now vacant. Action Required: Please designate a new manager for the '{deptName}' department to ensure administrative continuity.";
             }
 
             return new EmployeeActionResult(rows, message);

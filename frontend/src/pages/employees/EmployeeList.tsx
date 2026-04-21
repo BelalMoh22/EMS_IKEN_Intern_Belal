@@ -96,9 +96,12 @@ export default function EmployeeList() {
   const handleDelete = () => {
     if (deleteTarget !== null) {
       deleteMutation.mutate(deleteTarget, {
-        onSuccess: () => {
+        onSuccess: (response) => {
           setDeleteTarget(null);
-          enqueueSnackbar("Employee deleted successfully", { variant: "success" });
+          enqueueSnackbar(response.message || "Employee deleted successfully", { 
+            variant: "warning",
+            persist: true 
+          });
         },
         onError: (error) => {
           enqueueSnackbar(extractErrorMessage(error, "Failed to delete employee"), {

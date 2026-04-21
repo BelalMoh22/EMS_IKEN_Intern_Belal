@@ -4,18 +4,18 @@ namespace backend.Features.TimeTrack.WorkLogs.SaveTimesheet
     {
         private readonly IWorkLogRepository _repo;
         private readonly EmployeeRepository _employeeRepo;
-        private readonly IProjectRepository _projectRepo;
+        private readonly IWorkLogBusinessRules _rules;
         private readonly ICurrentUserService _currentUser;
 
         public SaveTimesheetHandler(
             IWorkLogRepository repo,
             EmployeeRepository employeeRepo,
-            IProjectRepository projectRepo,
+            IWorkLogBusinessRules rules,
             ICurrentUserService currentUser)
         {
             _repo = repo;
             _employeeRepo = employeeRepo;
-            _projectRepo = projectRepo;
+            _rules = rules;
             _currentUser = currentUser;
         }
 
@@ -28,40 +28,8 @@ namespace backend.Features.TimeTrack.WorkLogs.SaveTimesheet
 
             var dto = request.Dto;
 
-            // Validate
-            var errors = new Dictionary<string, List<string>>();
-
-            if (dto.Entries == null || !dto.Entries.Any())
-            {
-                errors["entries"] = new List<string> { "No entries to save." };
-                throw new Exceptions.ValidationException(errors);
-            }
-
-            foreach (var entry in dto.Entries)
-            {
-                if (entry.Hours < 0 || entry.Hours > 24)
-                {
-                    errors["hours"] = new List<string> { $"Hours must be between 0 and 24. (Project: {entry.ProjectId}, Date: {entry.Date})" };
-                }
-
-                if (!DateTime.TryParse(entry.Date, out _))
-                {
-                    errors["date"] = new List<string> { $"Invalid date format: {entry.Date}" };
-                }
-
-                var project = await _projectRepo.GetByIdAsync(entry.ProjectId);
-                if (project == null || project.IsDeleted)
-                {
-                    errors["projectId"] = new List<string> { $"Project {entry.ProjectId} does not exist." };
-                }
-                else if (project.Status != ProjectStatus.Open)
-                {
-                    errors["projectId"] = new List<string> { $"Cannot log hours on closed project '{project.Name}'." };
-                }
-            }
-
-            if (errors.Any())
-                throw new Exceptions.ValidationException(errors);
+            // Validate using business rules
+            await _rules.ValidateTimesheetAsync(dto);
 
             // Build entities
             var entities = dto.Entries.Select(e => new WorkLog(

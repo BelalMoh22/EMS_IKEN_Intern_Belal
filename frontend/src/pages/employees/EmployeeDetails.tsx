@@ -76,9 +76,12 @@ export default function EmployeeDetails() {
 
   const handleDelete = () => {
     deleteMutation.mutate(employeeId, {
-      onSuccess: () => {
+      onSuccess: (response) => {
         setDeleteDialogOpen(false);
-        enqueueSnackbar("Employee deleted successfully", { variant: "success" });
+        enqueueSnackbar(response.message || "Employee deleted successfully", { 
+          variant: "warning",
+          persist: true 
+        });
         navigate("/employees");
       },
       onError: (error) => {

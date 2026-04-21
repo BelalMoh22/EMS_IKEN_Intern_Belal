@@ -106,25 +106,50 @@ export default function EditEmployee() {
   // Derive role-position mismatch warning
   const rolePositionMismatch = useMemo(() => {
     if (!positions || !watchedPositionId || !watchedRole) return null;
-    // HR role is independent of position — no mismatch possible
-    if (watchedRole === "HR") return null;
 
     const selectedPosition = positions.find(
       (p) => p.id === Number(watchedPositionId),
     );
     if (!selectedPosition) return null;
 
+    const isHRPosition = 
+      selectedPosition.departmentName?.toUpperCase() === "HR" || 
+      selectedPosition.departmentName?.toUpperCase() === "HR SPECIALIST" || 
+      selectedPosition.positionName?.toUpperCase().includes("HR");
+
+    // Case 1: HR Role Validation
+    if (watchedRole === "HR") {
+        if (!isHRPosition) {
+            return {
+                severity: "error" as const,
+                message: 'You have set the role to "HR" but the selected position is not an HR position. Please assign an HR-specific position for this role.'
+            };
+        }
+        return null;
+    }
+
+    // Case 2: Non-HR Role in HR Position
+    // (At this point, TypeScript knows watchedRole is NOT "HR")
+    if (isHRPosition) {
+        return {
+            severity: "error" as const,
+            message: `The selected position is an HR position. Only users with the "HR" role can be assigned to this position.`
+        };
+    }
+
+    // Case 3: Manager Validation
     if (watchedRole === "Manager" && !selectedPosition.isManager) {
       return {
-        severity: "warning" as const,
+        severity: "error" as const,
         message:
           'You have set the role to "Manager" but the selected position is not a manager position. Please assign a position that has manager privileges enabled.',
       };
     }
 
+    // Case 4: Employee Validation
     if (watchedRole === "Employee" && selectedPosition.isManager) {
       return {
-        severity: "warning" as const,
+        severity: "error" as const,
         message:
           'You have set the role to "Employee" but the selected position is a manager position. Please assign a non-manager position for this role.',
       };

@@ -96,9 +96,6 @@ namespace backend.Infrastructure.BusinessRules.Employees
         }
         public async Task<string?> HandleManagerRemovalAsync(int employeeId)
         {
-            // Now that multiple managers are permitted and managers are derived from their positions,
-            // there is no longer a single ManagerId on the Department to nullify.
-            // We simply return the department name if the employee was a manager for informational purposes.
             var department = await _deptRepository.GetByManagerIdAsync(employeeId);
             return department?.DepartmentName;
         }

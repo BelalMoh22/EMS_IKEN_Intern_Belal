@@ -21,10 +21,12 @@ import {
   Grid,
   Divider,
   TextField,
+  Alert,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import { useSnackbar } from "notistack";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { ROLE_ENUM_MAP } from "@/types";
 import type { Role } from "@/types";
 import { handleApiErrors } from "@/utils/handleApiErrors";
@@ -131,6 +133,62 @@ export default function CreateEmployee() {
 
   // Filter positions by selected department if needed
   const watchedPositionId = methods.watch("positionId");
+  const watchedRole = methods.watch("role");
+
+  // Derive role-position mismatch warning
+  const rolePositionMismatch = useMemo(() => {
+    if (!positions || !watchedPositionId || !watchedRole) return null;
+
+    const selectedPosition = positions.find(
+      (p) => p.id === Number(watchedPositionId),
+    );
+    if (!selectedPosition) return null;
+
+    const isHRPosition = 
+      selectedPosition.departmentName?.toUpperCase() === "HR" || 
+      selectedPosition.departmentName?.toUpperCase() === "HUMAN RESOURCES" ||
+      selectedPosition.positionName?.toUpperCase().includes("HR");
+
+    // Case 1: HR Role Validation
+    if (watchedRole === "HR") {
+        if (!isHRPosition) {
+            return {
+                severity: "error" as const,
+                message: 'You have set the role to "HR" but the selected position is not an HR position. Please assign an HR-specific position for this role.'
+            };
+        }
+        return null;
+    }
+
+    // Case 2: Non-HR Role in HR Position
+    // (At this point, TypeScript knows watchedRole is NOT "HR")
+    if (isHRPosition) {
+        return {
+            severity: "error" as const,
+            message: `The selected position is an HR position. Only users with the "HR" role can be assigned to this position.`
+        };
+    }
+
+    // Case 3: Manager Validation
+    if (watchedRole === "Manager" && !selectedPosition.isManager) {
+      return {
+        severity: "error" as const,
+        message:
+          'You have set the role to "Manager" but the selected position is not a manager position. Please assign a position that has manager privileges enabled.',
+      };
+    }
+
+    // Case 4: Employee Validation
+    if (watchedRole === "Employee" && selectedPosition.isManager) {
+      return {
+        severity: "error" as const,
+        message:
+          'You have set the role to "Employee" but the selected position is a manager position. Please assign a non-manager position for this role.',
+      };
+    }
+
+    return null;
+  }, [watchedRole, watchedPositionId, positions]);
 
   // Auto-set role based on position
   useEffect(() => {
@@ -210,6 +268,21 @@ export default function CreateEmployee() {
                     ]}
                   />
                 </Grid>
+                {/* Role-Position mismatch warning */}
+                {rolePositionMismatch && (
+                  <Grid size={{ xs: 12 }}>
+                    <Alert
+                      severity={rolePositionMismatch.severity}
+                      icon={<WarningAmberIcon />}
+                      sx={{
+                        borderRadius: 2,
+                        "& .MuiAlert-message": { fontWeight: 500 },
+                      }}
+                    >
+                      {rolePositionMismatch.message}
+                    </Alert>
+                  </Grid>
+                )}
               </Grid>
             </CardContent>
           </Card>
@@ -379,14 +452,18 @@ export default function CreateEmployee() {
             <Button
               type="submit"
               variant="contained"
-              disabled={submitting}
+              disabled={submitting || !!rolePositionMismatch}
               sx={{
                 px: 4,
                 py: 1,
                 borderRadius: 2,
-                background: "linear-gradient(135deg, #3b82f6, #1d4ed8)",
+                background: rolePositionMismatch
+                    ? undefined
+                    : "linear-gradient(135deg, #3b82f6, #1d4ed8)",
                 "&:hover": {
-                  background: "linear-gradient(135deg, #2563eb, #1e40af)",
+                  background: rolePositionMismatch
+                    ? undefined
+                    : "linear-gradient(135deg, #2563eb, #1e40af)",
                 },
               }}
             >

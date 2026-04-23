@@ -9,6 +9,22 @@ namespace backend.Infrastructure.Repositories
 
         protected override string TableName => "Employees";
 
+        public override async Task<IEnumerable<Employee>> GetAllAsync()
+        {
+            var sql = @"
+                SELECT e.*, u.*
+                FROM Employees e
+                LEFT JOIN Users u ON e.UserId = u.Id
+                WHERE e.IsDeleted = 0";
+
+            using var connection = _connectionFactory.CreateConnection();
+            return await connection.QueryAsync<Employee, User, Employee>(sql, (e, u) => // Multiple mapping: Employee and User (QueryAsync<TFirst, TSecond, TReturn>)
+            {
+                e.User = u; // Attach the User object to the Employee
+                return e;
+            }, splitOn: "Id"); // splitOn: "Id" tells Dapper to split the result set on the Id column to map Employee and User correctly
+        }
+
         public async Task<IEnumerable<Employee>> GetAllActiveEmployeesAsync()
         {
             return await GetAllAsync();
@@ -21,7 +37,9 @@ namespace backend.Infrastructure.Repositories
                 FROM Employees e
                 LEFT JOIN Users u ON e.UserId = u.Id
                 LEFT JOIN Positions p ON e.PositionId = p.Id
-                WHERE e.IsDeleted = 0 AND (p.IsManager = 0 OR p.IsManager IS NULL)";
+                WHERE e.IsDeleted = 0 
+                  AND e.Status = 1 
+                  AND e.Email IS NOT NULL AND e.Email <> ''";
 
             using var connection = _connectionFactory.CreateConnection();
             return await connection.QueryAsync<Employee, User, Position, Employee>(sql, (e, u, p) =>
@@ -30,22 +48,6 @@ namespace backend.Infrastructure.Repositories
                 e.Position = p;
                 return e;
             }, splitOn: "Id,Id");
-        }
-
-        public override async Task<IEnumerable<Employee>> GetAllAsync()
-        {
-            var sql = @"
-                SELECT e.*, u.*
-                FROM Employees e
-                LEFT JOIN Users u ON e.UserId = u.Id
-                WHERE e.IsDeleted = 0";
-
-            using var connection = _connectionFactory.CreateConnection();
-            return await connection.QueryAsync<Employee, User, Employee>(sql, (e, u) => // Multiple mapping: Employee and User (QueryAsync<TFirst, TSecond, TReturn>)
-            {
-                e.User = u; // �Attach the User object to the Employee�
-                return e;
-                        }, splitOn: "Id"); // splitOn: "Id" tells Dapper to split the result set on the Id column to map Employee and User correctly
         }
 
         public override async Task<Employee?> GetByIdAsync(int id)

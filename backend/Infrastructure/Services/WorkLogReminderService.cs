@@ -26,7 +26,6 @@ namespace backend.Infrastructure.Services
         {
             _logger.LogInformation("Checking for overdue work logs...");
 
-            // Skip on weekends (Friday & Saturday)
             if (DateTime.UtcNow.DayOfWeek == DayOfWeek.Friday || DateTime.UtcNow.DayOfWeek == DayOfWeek.Saturday)
             {
                 _logger.LogInformation("Today is a weekend. Skipping reminders.");
@@ -51,33 +50,37 @@ namespace backend.Infrastructure.Services
                 try
                 {
                     var lastLog = await _workLogRepository.GetLastLogByEmployeeId(employee.Id);
-                    DateTime lastLogDate = lastLog?.WorkDate ?? employee.HireDate;
+                    DateTime referenceDate = lastLog?.WorkDate ?? employee.HireDate;
+                    bool hasNeverLogged = (lastLog == null);
                     
-                    int workingDaysSinceLastLog = CalculateWorkingDays(lastLogDate, DateTime.UtcNow);
+                    int workingDaysSinceLastLog = CalculateWorkingDays(referenceDate, DateTime.UtcNow);
 
                     if (workingDaysSinceLastLog >= settings.WorkLogGracePeriodDays)
                     {
-                        _logger.LogInformation("Employee {Id} is OVERDUE ({Days} working days).", employee.Id, workingDaysSinceLastLog);
+                        // Check if a reminder was sent today
+                        if (!employee.LastReminderSentAt.HasValue || employee.LastReminderSentAt.Value.Date < DateTime.UtcNow.Date)
+                        {
+                            _logger.LogInformation("Sending reminder to {Id} ({Source}). Overdue days: {Days}", 
+                                employee.Id, hasNeverLogged ? "No Logs" : "Late Logs", workingDaysSinceLastLog);
 
-                        // Check if a reminder was sent in the last 24 hours
-                        if (!employee.LastReminderSentAt.HasValue || (DateTime.UtcNow - employee.LastReminderSentAt.Value).TotalHours >= 24)
-                        {
-                            await SendReminderEmail(employee, workingDaysSinceLastLog);
+                            await SendReminderEmail(employee, workingDaysSinceLastLog, hasNeverLogged);
                             await _employeeRepository.UpdateLastReminderSentAtAsync(employee.Id, DateTime.UtcNow);
+                            
+                            await Task.Delay(200); 
                         }
-                        else
-                        {
-                            _logger.LogInformation("Skipping email for {Id}: Reminder already sent in the last 24 hours.", employee.Id);
-                        }
-                    }
-                    else
-                    {
-                        _logger.LogInformation("Employee {Id} is up to date.", employee.Id);
                     }
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error processing reminders for employee {Id}", employee.Id);
+                    
+                    // If we hit the Gmail daily limit, stop processing the rest for today
+                    if (ex.ToString().Contains("Daily user sending limit exceeded") || 
+                        ex.InnerException?.ToString().Contains("Daily user sending limit exceeded") == true)
+                    {
+                        _logger.LogCritical("FATAL: SMTP Daily Limit Exceeded. Stopping reminders for today.");
+                        break; 
+                    }
                 }
             }
         }
@@ -93,18 +96,22 @@ namespace backend.Infrastructure.Services
                     workingDays++;
                 }
             }
-
             return workingDays;
         }
 
-        private async Task SendReminderEmail(Employee employee, int workingDaysSinceLastLog)
+        private async Task SendReminderEmail(Employee employee, int workingDaysSinceLastLog, bool hasNeverLogged)
         {
             string subject = "Action Required: Work Log Submission Reminder";
+            
+            string statusMessage = hasNeverLogged 
+                ? "You have not started logging your work in the system yet."
+                : $"You have not logged your work for <b>{workingDaysSinceLastLog} working {(workingDaysSinceLastLog == 1 ? "day" : "days")}</b>.";
+
             string body = $@"
                 <div style='font-family: sans-serif; padding: 20px; border: 1px solid #eee;'>
                     <h3>Work Log Reminder</h3>
                     <p>Hello {employee.FirstName},</p>
-                    <p>You have not logged your work for <b>{workingDaysSinceLastLog} working days</b>.</p>
+                    <p>{statusMessage}</p>
                     <p>Please log into the system and update your timesheet as soon as possible.</p>
                     <hr>
                     <p style='font-size: 12px; color: #888;'>

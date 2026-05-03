@@ -4,6 +4,7 @@ namespace backend.Domain.Enums
     {
         HR = 1,
         Manager = 2,
-        Employee = 3
+        Employee = 3,
+        Master = 4
     }
 }

@@ -6,17 +6,20 @@ namespace backend.Features.Employees.Handlers.Implementations
         private readonly IEmployeeBusinessRules _rules;
         private readonly IRepository<Position> _positionRepository;
         private readonly UserRepository _userRepository;
+        private readonly ICurrentUserService _currentUser;
 
         public UpdateEmployeeHandler(
             IRepository<Employee> repo,
             IEmployeeBusinessRules rules,
             IRepository<Position> positionRepository,
-            UserRepository userRepository)
+            UserRepository userRepository,
+            ICurrentUserService currentUser)
         {
             _repo = repo;
             _rules = rules;
             _positionRepository = positionRepository;
             _userRepository = userRepository;
+            _currentUser = currentUser;
         }
 
         public async Task<EmployeeActionResult> Handle(UpdateEmployeeCommand request,CancellationToken cancellationToken)
@@ -32,6 +35,22 @@ namespace backend.Features.Employees.Handlers.Implementations
             var employee = await _repo.GetByIdAsync(request.Id);
             if (employee is null)
                 throw new NotFoundException($"Employee with Id {request.Id} not found.");
+
+            // 🔒 Master can ONLY update HR employees
+            if (_currentUser.UserRole == Roles.Master.ToString())
+            {
+                if (employee.User == null || employee.User.Role != Roles.HR)
+                    throw new UnauthorizedAccessException("Master can only update HR employees.");
+
+                // Prevent Master from changing HR's role to something else
+                if (request.dto.Role.HasValue && request.dto.Role.Value != Roles.HR)
+                {
+                    throw new Exceptions.ValidationException(new Dictionary<string, List<string>>
+                    {
+                        { "role", new List<string> { "Master cannot change an HR employee's role." } }
+                    });
+                }
+            }
 
             var dto = request.dto;
             await _rules.ValidateForUpdateAsync(request.Id, dto, employee);

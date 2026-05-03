@@ -33,8 +33,9 @@ export default function EmployeeDetails() {
   const user = useAuthStore((s) => s.user);
   const employeeId = Number(id);
 
-  const canEdit = user?.role === "HR";
-  const canDelete = user?.role === "HR";
+  const isMaster = user?.role === "Master";
+  const canEdit = user?.role === "HR" || isMaster;
+  const canDelete = user?.role === "HR" || isMaster;
 
   const { data: employees, isLoading: loadingEmployees } = useEmployees();
   const { data: positions, isLoading: loadingPositions } = usePositions();
@@ -45,6 +46,7 @@ export default function EmployeeDetails() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const employee = employees?.find((e) => e.id === employeeId);
+  const isOwnAccount = employee?.user?.id === user?.id;
   const position = positions?.find((p) => p.id === employee?.positionId);
   const department = departments?.find((d) => d.id === position?.departmentId);
 
@@ -115,7 +117,7 @@ export default function EmployeeDetails() {
           basePath="/employees"
           id={employeeId}
           canEdit={canEdit}
-          canDelete={canDelete}
+          canDelete={canDelete && !isOwnAccount}
           onDelete={() => setDeleteDialogOpen(true)}
           hideView={true}
         />

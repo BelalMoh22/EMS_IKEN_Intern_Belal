@@ -5,12 +5,14 @@ namespace backend.Features.Employees.DeleteEmployee
         private readonly IRepository<Employee> _repo;
         private readonly UserRepository _userRepo;
         private readonly IEmployeeBusinessRules _rules;
+        private readonly ICurrentUserService _currentUser;
 
-        public DeleteEmployeeHandler(IRepository<Employee> repo, UserRepository userRepo, IEmployeeBusinessRules rules)
+        public DeleteEmployeeHandler(IRepository<Employee> repo, UserRepository userRepo, IEmployeeBusinessRules rules, ICurrentUserService currentUser)
         {
             _repo = repo;
             _userRepo = userRepo;
             _rules = rules;
+            _currentUser = currentUser;
         }
 
         public async Task<EmployeeActionResult> Handle(DeleteEmployeeCommand request, CancellationToken cancellationToken)
@@ -24,6 +26,21 @@ namespace backend.Features.Employees.DeleteEmployee
             var employee = await _repo.GetByIdAsync(request.id);
             if (employee == null)
                 throw new NotFoundException($"Employee with Id {request.id} not found.");
+
+            // 🔒 Master restrictions
+            if (_currentUser.UserRole == Roles.Master.ToString())
+            {
+                // Only allow deleting HR employees
+                if (employee.User == null || employee.User.Role != Roles.HR)
+                    throw new UnauthorizedAccessException("Master can only delete HR employees.");
+
+                // 🚫 Prevent self-delete
+                if (employee.UserId == _currentUser.UserId)
+                    throw new Exceptions.ValidationException(new Dictionary<string, List<string>>
+                    {
+                        { "id", new List<string> { "You cannot delete your own account." } }
+                    });
+            }
 
             // Check if manager in any department
             var deptName = await _rules.HandleManagerRemovalAsync(request.id);

@@ -44,19 +44,19 @@ const navItems: NavItem[] = [
     title: "Profile",
     url: "/profile",
     icon: <PersonIcon />,
-    roles: ["HR", "Manager", "Employee"],
+    roles: ["HR", "Manager", "Employee", "Master"],
   },
   {
     title: "Dashboard",
     url: "/dashboard",
     icon: <DashboardIcon />,
-    roles: ["HR", "Manager"],
+    roles: ["HR", "Manager", "Master"],
   },
   {
     title: "Employees",
     url: "/employees",
     icon: <PeopleIcon />,
-    roles: ["HR", "Manager"],
+    roles: ["HR", "Manager", "Master"],
   },
   {
     title: "Departments",
@@ -105,7 +105,7 @@ const navItems: NavItem[] = [
     title: "Change Password",
     url: "/change-password",
     icon: <LockResetIcon />,
-    roles: ["HR", "Manager", "Employee"],
+    roles: ["HR", "Manager", "Employee", "Master"],
   },
 ];
 

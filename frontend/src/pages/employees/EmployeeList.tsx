@@ -21,9 +21,10 @@ const INITIAL_PAGE_SIZE = 10;
 export default function EmployeeList() {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
-  const canCreate = user?.role === "HR";
-  const canEdit = user?.role === "HR";
-  const canDelete = user?.role === "HR";
+  const isMaster = user?.role === "Master";
+  const canCreate = user?.role === "HR" || isMaster;
+  const canEdit = user?.role === "HR" || isMaster;
+  const canDelete = user?.role === "HR" || isMaster;
 
   const [search, setSearch] = useState("");
   const [selectedDeptId, setSelectedDeptId] = useState<number | "all">("all");
@@ -34,8 +35,8 @@ export default function EmployeeList() {
   const [resetTarget, setResetTarget] = useState<Employee | null>(null);
 
   const { data: employees, isLoading } = useEmployees();
-  const { data: positions } = usePositions({ enabled: user?.role === "HR" || user?.role === "Manager" });
-  const { data: departments } = useDepartments({ enabled: user?.role === "HR" || user?.role === "Manager" });
+  const { data: positions } = usePositions({ enabled: user?.role === "HR" || user?.role === "Manager" || isMaster });
+  const { data: departments } = useDepartments({ enabled: user?.role === "HR" || user?.role === "Manager" || isMaster });
   const deleteMutation = useDeleteEmployee();
   const resetMutation = useResetCredentials();
   const { enqueueSnackbar } = useSnackbar();
@@ -45,6 +46,16 @@ export default function EmployeeList() {
     if (!employees) return [];
     
     let result = [...employees];
+
+    // Master only sees HR
+    if (isMaster) {
+      result = result.filter(e => e.user?.role === "HR");
+    }
+
+    // HR and Managers cannot see Master
+    if (user?.role === "HR" || user?.role === "Manager") {
+      result = result.filter(e => e.user?.role !== "Master");
+    }
 
     // Filter by Search
     if (search) {
@@ -73,7 +84,7 @@ export default function EmployeeList() {
     }
 
     return result;
-  }, [employees, search, selectedDeptId, selectedPosId, positions]);
+  }, [employees, search, selectedDeptId, selectedPosId, positions, isMaster]);
 
   // Reset page when filters change
   useEffect(() => {
@@ -158,16 +169,19 @@ export default function EmployeeList() {
     },
     {
       header: "Actions" as const,
-      cell: (row: Employee) => (
-        <ActionButtons
-          basePath="/employees"
-          id={row.id}
-          canEdit={canEdit}
-          canDelete={canDelete}
-          onDelete={(id) => setDeleteTarget(Number(id))}
-          onResetPassword={user?.role === "HR" ? () => setResetTarget(row) : undefined}
-        />
-      ),
+      cell: (row: Employee) => {
+        const isOwnAccount = row.user?.id === user?.id;
+        return (
+          <ActionButtons
+            basePath="/employees"
+            id={row.id}
+            canEdit={canEdit}
+            canDelete={canDelete && !isOwnAccount}
+            onDelete={(id) => setDeleteTarget(Number(id))}
+            onResetPassword={(user?.role === "HR" || isMaster) ? () => setResetTarget(row) : undefined}
+          />
+        );
+      },
     },
   ];
 

@@ -13,7 +13,16 @@ namespace backend.Features.Employees.GetEmployees
         {
             if (request.UserRole == Roles.HR.ToString())
             {
-                return await _repo.GetAllAsync();
+                var all = await _repo.GetAllAsync();
+                // HR can see everyone except Master
+                return all.Where(e => e.User == null || e.User.Role != Roles.Master);
+            }
+
+            if (request.UserRole == Roles.Master.ToString())
+            {
+                // Master can only view HR employees
+                var all = await _repo.GetAllAsync();
+                return all.Where(e => e.User != null && e.User.Role == Roles.HR);
             }
 
             if (request.UserRole == Roles.Manager.ToString())
@@ -21,7 +30,9 @@ namespace backend.Features.Employees.GetEmployees
                 var manager = await _repo.GetByUserIdAsync(request.UserId);
                 if (manager == null) return Enumerable.Empty<Employee>();
 
-                return await _repo.GetEmployeesByManagerIdAsync(manager.Id);
+                var team = await _repo.GetEmployeesByManagerIdAsync(manager.Id);
+                // Manager can see team except Master
+                return team.Where(e => e.User == null || e.User.Role != Roles.Master);
             }
             return Enumerable.Empty<Employee>();
         }

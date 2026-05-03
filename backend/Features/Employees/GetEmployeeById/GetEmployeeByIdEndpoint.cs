@@ -8,7 +8,7 @@ namespace backend.Features.Employees.GetEmployeeById
             {
                 var command = new GetEmployeeByIdQuery(id);
                 var result = await mediator.Send(command);
-                return Results.Ok(ApiResponse<Employee>.SuccessResponse(result, "Employee retrieved successfully"));
+                return Results.Ok(ApiResponse<Employee>.SuccessResponse(result!, "Employee retrieved successfully"));
             }).WithName("GetEmployeeById").WithTags("Employees")
             .DocumentApiResponse<Employee>(
                 "Get employee by id",

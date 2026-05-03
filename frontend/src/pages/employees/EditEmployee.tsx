@@ -48,7 +48,7 @@ const schema = z.object({
   salary: z.coerce.number().min(0, "Salary must be positive"),
   positionId: z.coerce.number().min(1, "Position is required"),
   status: z.coerce.number().min(1).max(3),
-  role: z.enum(["HR", "Manager", "Employee"]),
+  role: z.enum(["HR", "Manager", "Employee", "Master"]),
   username: z.string().optional(),
 });
 
@@ -62,6 +62,9 @@ export default function EditEmployee() {
   const updateMutation = useUpdateEmployee();
   const { data: positions } = usePositions();
   const { enqueueSnackbar } = useSnackbar();
+
+  const user = useAuthStore((s) => s.user);
+  const isMaster = user?.role === "Master";
 
   const methods = useForm<FormData>({
     resolver: zodResolver(schema) as any,
@@ -226,9 +229,9 @@ export default function EditEmployee() {
                     label="Role"
                     options={[
                       { label: "HR", value: "HR" },
-                      { label: "Manager", value: "Manager" },
-                      { label: "Employee", value: "Employee" },
-                    ]}
+                      { label: "Manager", value: "Manager", disabled: isMaster },
+                      { label: "Employee", value: "Employee", disabled: isMaster },
+                    ].filter(opt => !isMaster || opt.value === "HR")}
                   />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }}>

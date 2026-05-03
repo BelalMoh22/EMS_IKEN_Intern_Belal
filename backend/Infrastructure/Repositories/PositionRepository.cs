@@ -2,7 +2,7 @@ namespace backend.Infrastructure.Repositories
 {
     public class PositionRepository : Repository<Position>
     {
-        public PositionRepository(IDbConnectionFactory connectionFactory,ILogger<Repository<Position>> logger): base(connectionFactory, logger)
+        public PositionRepository(IDbConnectionFactory connectionFactory, ILogger<Repository<Position>> logger) : base(connectionFactory, logger)
         {
         }
 
@@ -11,7 +11,8 @@ namespace backend.Infrastructure.Repositories
         public override async Task<IEnumerable<Position>> GetAllAsync()
         {
             var sql = @"
-                SELECT p.*, d.DepartmentName
+                SELECT p.*, d.DepartmentName,
+                       (SELECT COUNT(*) FROM Employees e WHERE e.PositionId = p.Id AND e.IsDeleted = 0) as CurrentEmployeeCount
                 FROM Positions p
                 JOIN Departments d ON p.DepartmentId = d.Id
                 WHERE p.IsDeleted = 0 AND d.IsDeleted = 0";
@@ -23,7 +24,8 @@ namespace backend.Infrastructure.Repositories
         public override async Task<Position?> GetByIdAsync(int id)
         {
             var sql = @"
-                SELECT p.*, d.DepartmentName
+                SELECT p.*, d.DepartmentName,
+                       (SELECT COUNT(*) FROM Employees e WHERE e.PositionId = p.Id AND e.IsDeleted = 0) as CurrentEmployeeCount
                 FROM Positions p
                 JOIN Departments d ON p.DepartmentId = d.Id
                 WHERE p.Id = @Id";

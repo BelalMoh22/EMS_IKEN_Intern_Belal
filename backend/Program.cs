@@ -74,7 +74,7 @@ namespace backend
 
                         ValidIssuer = builder.Configuration["Jwt:Issuer"],
                         ValidAudience = builder.Configuration["Jwt:Audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? string.Empty)),
                         ClockSkew = TimeSpan.Zero  // No extra time after expiration
                     };
                 });
@@ -91,14 +91,21 @@ namespace backend
             // Use Authorization
             builder.Services.AddAuthorization( builder =>
             {
+                // HR-only: full access to Departments, Positions, etc.
                 builder.AddPolicy("FullCRUD", context =>
                 {
                     context.RequireRole(Roles.HR.ToString());
                 });
 
+                // HR + Master: employee Create/Update/Delete (Master restricted to HR targets at handler level)
+                builder.AddPolicy("EmployeeCRUD", context =>
+                {
+                    context.RequireRole(Roles.HR.ToString(), Roles.Master.ToString());
+                });
+
                 builder.AddPolicy("ReadResource", context =>
                 {
-                    context.RequireRole(Roles.HR.ToString(), Roles.Manager.ToString());
+                    context.RequireRole(Roles.HR.ToString(), Roles.Manager.ToString(), Roles.Master.ToString());
                 });
 
                 builder.AddPolicy("ManagerTimeTrack", context =>

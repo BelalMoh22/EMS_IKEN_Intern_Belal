@@ -1,5 +1,5 @@
 // ─── Roles ───────────────────────────────────────────────
-export type Role = "HR" | "Manager" | "Employee";
+export type Role = "HR" | "Manager" | "Employee" | "Master";
 
 // ─── Auth ────────────────────────────────────────────────
 export interface User {
@@ -50,10 +50,12 @@ export const ROLE_ENUM_MAP: Record<Role, number> = {
   HR: 1,
   Manager: 2,
   Employee: 3,
+  Master: 4,
 };
 
 export const ROLE_FROM_NUMBER: Record<number, Role> = {
   1: "HR",
   2: "Manager",
   3: "Employee",
+  4: "Master",
 };

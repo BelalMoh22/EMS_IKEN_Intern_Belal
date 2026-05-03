@@ -16,5 +16,6 @@ namespace backend.Features.Employees.GetEmployeeByUserId
         
         public string PositionName { get; set; }
         public string DepartmentName { get; set; }
+        public Roles Role { get; set; }
     }
 }

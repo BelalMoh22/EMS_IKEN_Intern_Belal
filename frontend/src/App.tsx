@@ -66,7 +66,7 @@ const App = () => (
           <Route
             path="/dashboard"
             element={
-              <RoleBasedRoute allowedRoles={["HR", "Manager"]}>
+              <RoleBasedRoute allowedRoles={["HR", "Manager", "Master"]}>
                 <Dashboard />
               </RoleBasedRoute>
             }
@@ -76,7 +76,7 @@ const App = () => (
           <Route
             path="/employees"
             element={
-              <RoleBasedRoute allowedRoles={["HR", "Manager"]}>
+              <RoleBasedRoute allowedRoles={["HR", "Manager", "Master"]}>
                 <EmployeeList />
               </RoleBasedRoute>
             }
@@ -84,7 +84,7 @@ const App = () => (
           <Route
             path="/employees/:id"
             element={
-              <RoleBasedRoute allowedRoles={["HR", "Manager"]}>
+              <RoleBasedRoute allowedRoles={["HR", "Manager", "Master"]}>
                 <EmployeeDetails />
               </RoleBasedRoute>
             }
@@ -94,7 +94,7 @@ const App = () => (
           <Route
             path="/employees/create"
             element={
-              <RoleBasedRoute allowedRoles={["HR"]}>
+              <RoleBasedRoute allowedRoles={["HR", "Master"]}>
                 <CreateEmployee />
               </RoleBasedRoute>
             }
@@ -104,7 +104,7 @@ const App = () => (
           <Route
             path="/employees/edit/:id"
             element={
-              <RoleBasedRoute allowedRoles={["HR"]}>
+              <RoleBasedRoute allowedRoles={["HR", "Master"]}>
                 <EditEmployee />
               </RoleBasedRoute>
             }

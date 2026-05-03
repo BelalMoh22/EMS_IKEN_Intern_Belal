@@ -247,10 +247,12 @@ namespace backend.Infrastructure.Repositories
                     e.HireDate,
                     e.Status,
                     p.PositionName,
-                    d.DepartmentName
+                    d.DepartmentName,
+                    u.Role
                 FROM Employees e
                 LEFT JOIN Positions p ON e.PositionId = p.Id AND p.IsDeleted = 0
                 LEFT JOIN Departments d ON p.DepartmentId = d.Id AND d.IsDeleted = 0
+                LEFT JOIN Users u ON e.UserId = u.Id AND u.IsDeleted = 0
                 WHERE e.UserId = @UserId AND e.IsDeleted = 0
             ";
 

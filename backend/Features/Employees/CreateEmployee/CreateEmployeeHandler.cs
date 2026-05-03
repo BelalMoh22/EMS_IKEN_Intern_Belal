@@ -6,13 +6,15 @@ namespace backend.Features.Employees.CreateEmployee
         private readonly UserRepository _userRepository;
         private readonly IRepository<Position> _positionRepository;
         private readonly IEmployeeBusinessRules _rules;
+        private readonly ICurrentUserService _currentUser;
 
-        public CreateEmployeeHandler(IRepository<Employee> _repo, UserRepository _userRepository, IRepository<Position> _positionRepository, IEmployeeBusinessRules _rules)
+        public CreateEmployeeHandler(IRepository<Employee> _repo, UserRepository _userRepository, IRepository<Position> _positionRepository, IEmployeeBusinessRules _rules, ICurrentUserService currentUser)
         {
             this._repo = _repo;
             this._userRepository = _userRepository;
             this._positionRepository = _positionRepository;
             this._rules = _rules;
+            this._currentUser = currentUser;
         }
         public async Task<int> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
         {
@@ -20,6 +22,18 @@ namespace backend.Features.Employees.CreateEmployee
             await _rules.ValidateForCreateAsync(dto);
 
             var position = await _positionRepository.GetByIdAsync(dto.PositionId);
+
+            // 🔒 Master can ONLY create HR accounts
+            if (_currentUser.UserRole == Roles.Master.ToString())
+            {
+                if (dto.Role != Roles.HR)
+                {
+                    throw new Exceptions.ValidationException(new Dictionary<string, List<string>>
+                    {
+                        { "role", new List<string> { "Master can only create HR accounts." } }
+                    });
+                }
+            }
             
             // If the DTO specifies HR, we keep it. Otherwise, we derive from Position.IsManager
             var role = dto.Role == Roles.HR ? Roles.HR : 

@@ -30,6 +30,7 @@ import { useEffect, useState, useMemo } from "react";
 import { ROLE_ENUM_MAP } from "@/types";
 import type { Role } from "@/types";
 import { handleApiErrors } from "@/utils/handleApiErrors";
+import { useAuthStore } from "@/stores/auth";
 
 const schema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -57,7 +58,7 @@ const schema = z.object({
   // User account fields
   username: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
-  role: z.enum(["HR", "Manager", "Employee"]),
+  role: z.enum(["HR", "Manager", "Employee", "Master"]),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -73,6 +74,9 @@ export default function CreateEmployee() {
   const { enqueueSnackbar } = useSnackbar();
   const [submitting, setSubmitting] = useState(false);
 
+  const user = useAuthStore((s) => s.user);
+  const isMaster = user?.role === "Master";
+
   const methods = useForm<FormData>({
     resolver: zodResolver(schema) as any,
     defaultValues: {
@@ -87,7 +91,7 @@ export default function CreateEmployee() {
       positionId: state?.positionId ?? 0,
       username: "",
       password: "1234",
-      role: "Employee",
+      role: isMaster ? "HR" : "Employee",
     },
   });
 
@@ -263,9 +267,9 @@ export default function CreateEmployee() {
                     required
                     options={[
                       { label: "HR", value: "HR" },
-                      { label: "Manager", value: "Manager" },
-                      { label: "Employee", value: "Employee" },
-                    ]}
+                      { label: "Manager", value: "Manager", disabled: isMaster },
+                      { label: "Employee", value: "Employee", disabled: isMaster },
+                    ].filter(opt => !isMaster || opt.value === "HR")}
                   />
                 </Grid>
                 {/* Role-Position mismatch warning */}
